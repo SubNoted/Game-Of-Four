@@ -225,9 +225,6 @@ void loop()
             tft.setCursor(40,30+17*i);
             tft.print(debugtxt[i]);
         }
-        
-
         last_debugtxt[i] = debugtxt[i];
-
     }
 }
