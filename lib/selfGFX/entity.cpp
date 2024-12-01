@@ -574,7 +574,7 @@ void Entity::drawParallelepiped()
     }
     
     //draw
-    this->createSprite(abs(maxp.x - minp.x) + 1, abs(maxp.y - minp.y) + 1);
+    //this->createSprite(abs(maxp.x - minp.x) + 1, abs(maxp.y - minp.y) + 1);
     this->sprite->setOrigin(-minp.x, -minp.y);
 
     if (!split)
@@ -605,8 +605,8 @@ void Entity::drawParallelepiped()
     this->print(Text[1], Vector2(pos.x, pos.y + 15*(textSize + 1)), (1-o.z/200)*textSize, textColor);
     this->print(Text[2], Vector2(pos.x, pos.y + 30*(textSize + 1)), (1-o.z/200)*textSize, textColor);*/
         
-    sprite->pushSprite(o.x + minp.x, o.y + minp.y, TFT_TRANSPARENT);
-    sprite->deleteSprite();
+    //sprite->pushSprite(o.x + minp.x, o.y + minp.y, TFT_TRANSPARENT);
+    //sprite->deleteSprite();
 
     endDraw();
 }

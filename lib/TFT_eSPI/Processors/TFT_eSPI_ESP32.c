@@ -673,6 +673,31 @@ void TFT_eSPI::pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t
 
   spiBusyCheck++;
 }
+void TFT_eSPI::pushImageDMA8bit(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t const* image)
+{
+  if ((w == 0) || (h == 0) || (!DMA_Enabled)) return;
+
+  uint32_t len = w*h;
+
+  dmaWait();
+
+  setAddrWindow(x, y, w, h);
+
+  esp_err_t ret;
+  static spi_transaction_t trans;
+
+  memset(&trans, 0, sizeof(spi_transaction_t));
+
+  trans.user = (void *)1;
+  trans.tx_buffer = image;   //Data pointer
+  trans.length = len * 16;   //Data length, in bits
+  trans.flags = SPI_TRANS_MODE_OCT;           //SPI_TRANS_USE_TXDATA flag
+
+  ret = spi_device_queue_trans(dmaHAL, &trans, portMAX_DELAY);
+  assert(ret == ESP_OK);
+
+  spiBusyCheck++;
+}
 
 
 /***************************************************************************************
@@ -682,6 +707,7 @@ void TFT_eSPI::pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t
 // This will clip and also swap bytes if setSwapBytes(true) was called by sketch
 void TFT_eSPI::pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t* image, uint16_t* buffer)
 {
+    //log_d("loooool");
   if ((x >= _vpW) || (y >= _vpH) || (!DMA_Enabled)) return;
 
   int32_t dx = 0;

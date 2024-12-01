@@ -787,6 +787,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
 #if defined (ESP32) // ESP32 only at the moment
            // For case where pointer is a const and the image data must not be modified (clipped or byte swapped)
   void     pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t const* data);
+  void     pushImageDMA8bit(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t const* data);
 #endif
            // Push a block of pixels into a window set up using setAddrWindow()
   void     pushPixelsDMA(uint16_t* image, uint32_t len);
