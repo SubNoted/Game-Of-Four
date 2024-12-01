@@ -29,7 +29,7 @@ private:
     void createSprite(uint16_t x, uint16_t y);
     void toFOV_XY(Vector* v, const float& fov, const Vector& actOffSet, const Vector& refOffSet);
     void toFOV_XY(Vector* v, const float& fov, const Vector& offSet);
-    void helpBuildCube(Vector* p, uint32_t c, bool light);
+    void drawCubeFaces(Vector* p, uint32_t c, bool light);
     void print(String s, Vector2 pos, float siz, uint32_t c);
 
     void endDraw();

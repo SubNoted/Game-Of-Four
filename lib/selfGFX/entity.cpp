@@ -370,32 +370,13 @@ void Entity::toFOV_XY(Vector* v, const float& fov, const Vector& actOffSet, cons
                     CENTR_Y + (v->y - CENTR_Y)/(v->z*tan(fov/2)/SCREEN_WIDTH+1));
     v->Minus(refOffSet);
 }
-void Entity::helpBuildCube(Vector* p, const uint32_t c, bool light)
+void Entity::drawCubeFaces(Vector* p, const uint32_t c, bool light)
 {
     uint32_t col = c;
     float shade;
     Vector normal;
     for(int i=0;i<4;i++)
     {
-        /*sprite->drawLine(
-            int32_t(p[i].x), 
-            int32_t(p[i].y), 
-            int32_t(p[(i+1)%4].x), 
-            int32_t(p[(i+1)%4].y), 
-        c);
-        sprite->drawLine(
-            int32_t(p[i+4].x), 
-            int32_t(p[i+4].y), 
-            int32_t(p[(i+1)%4+4].x), 
-            int32_t(p[(i+1)%4+4].y), 
-        c);
-        sprite->drawLine(
-            int32_t(p[i].x), 
-            int32_t(p[i].y), 
-            int32_t(p[i+4].x), 
-            int32_t(p[i+4].y), 
-        c);*/
-
         //facing camera (normal.z < 0)
         col = c;
         normal = Vector::Normal(p[i], p[(i+1)%4], p[(i+1)%4+4]);
@@ -483,19 +464,17 @@ void Entity::drawParallelepiped()
 
     const uint16_t n = 8;
     
-    minp.Equals(999,999), maxp.Equals(-999,-999);
-
-    
-    ////////////////////////////////////
-    /////////////4////////////5/////////
-    ////////////////////////////////////
-    ////////////////////////////////////
-    //////0////////////1////////////////
-    ////////////////////////////////////
-    /////////////7///////////6//////////
-    ////////////////////////////////////
-    //////3////////////2////////////////
-    ////////////////////////////////////
+    minp.Equals(999,999), maxp.Equals(-999,-999);   
+                                        
+        //          4----------5         
+        //        /          / |        
+        //     /          /    |         
+        //   0----------1      |         
+        //   |      7   |      6      
+        //   |          |    /           
+        //   |          | /          
+        //   3----------2                
+                                        
     Vector last_p[n];
     last_p[0].Equals(-last_Size.x/2, -last_Size.y/2, last_Size.z/2);
     last_p[1].Equals(last_Size.x/2, -last_Size.y/2, last_Size.z/2);
@@ -523,28 +502,28 @@ void Entity::drawParallelepiped()
             maxp.y = last_p[i].y;
     }
 
-    if (split)
-    {
-        this->createSprite(abs(maxp.x - minp.x) + 1, abs(maxp.y - minp.y) + 1);
-        this->sprite->setOrigin(-minp.x, -minp.y);
+    // if (split)
+    // {
+    //     this->createSprite(abs(maxp.x - minp.x) + 1, abs(maxp.y - minp.y) + 1);
+    //     this->sprite->setOrigin(-minp.x, -minp.y);
         
-        sprite->setTextWrap(last_textWrap);
-        Vector pos = Vector(last_textOffSet.x, last_textOffSet.y, -last_Size.z/2);
-        toFOV_XY(&pos, *last_FOV, last_o, o);
-        for(uint8_t i = 0; i < 3; i++)
-        {
-            pos.y += 15*(last_textSize + 1)*(int)(i>0);
-            print(last_Text[i], pos, (1-last_o.z/200)*(last_textSize), *BG_COL);
-        }
-        /*this->print(last_Text[0], Vector2(pos), (1-last_o.z/200)*last_textSize, *BG_COL);
-        this->print(last_Text[1], Vector2(pos.x, pos.y + 15*(last_textSize + 1)), (1-last_o.z/200)*last_textSize, *BG_COL);
-        this->print(last_Text[2], Vector2(pos.x, pos.y + 30*(last_textSize + 1)), (1-last_o.z/200)*last_textSize, *BG_COL);
-        */helpBuildCube(last_p, *BG_COL, false);
+    //     sprite->setTextWrap(last_textWrap);
+    //     Vector pos = Vector(last_textOffSet.x, last_textOffSet.y, -last_Size.z/2);
+    //     toFOV_XY(&pos, *last_FOV, last_o, o);
+    //     for(uint8_t i = 0; i < 3; i++)
+    //     {
+    //         pos.y += 15*(last_textSize + 1)*(int)(i>0);
+    //         print(last_Text[i], pos, (1-last_o.z/200)*(last_textSize), *BG_COL);
+    //     }
+    //     /*this->print(last_Text[0], Vector2(pos), (1-last_o.z/200)*last_textSize, *BG_COL);
+    //     this->print(last_Text[1], Vector2(pos.x, pos.y + 15*(last_textSize + 1)), (1-last_o.z/200)*last_textSize, *BG_COL);
+    //     this->print(last_Text[2], Vector2(pos.x, pos.y + 30*(last_textSize + 1)), (1-last_o.z/200)*last_textSize, *BG_COL);
+    //     */drawCubeFaces(last_p, *BG_COL, false);
 
-        sprite->pushSprite(o.x + minp.x, o.y + minp.y, TFT_TRANSPARENT);
-        sprite->deleteSprite();
-        minp.Equals(999,999), maxp.Equals(-999,-999);
-    }
+    //     sprite->pushSprite(o.x + minp.x, o.y + minp.y, TFT_TRANSPARENT);
+    //     sprite->deleteSprite();
+    //     minp.Equals(999,999), maxp.Equals(-999,-999);
+    // }
 
     Vector p[n];
     p[0].Equals(-Size.x/2, -Size.y/2, Size.z/2);
@@ -587,12 +566,9 @@ void Entity::drawParallelepiped()
             pos.y += 15*(textSize + 1)*(int)(i>0);
             print(last_Text[i], pos, (1-last_o.z/200)*(last_textSize), *BG_COL);
         }
-        /*this->print(last_Text[0], Vector2(pos.x, pos.y), (1-last_o.z/200)*last_textSize, *BG_COL);
-        this->print(last_Text[1], Vector2(pos.x, pos.y + 15*(last_textSize + 1)), (1-last_o.z/200)*last_textSize, *BG_COL);
-        this->print(last_Text[2], Vector2(pos.x, pos.y + 30*(last_textSize + 1)), (1-last_o.z/200)*last_textSize, *BG_COL);
-        */helpBuildCube(last_p, *BG_COL, false);
+        drawCubeFaces(last_p, *BG_COL, false);
     }
-    helpBuildCube(p, Color, true);
+    drawCubeFaces(p, Color, true);
     sprite->setTextWrap(textWrap);
     Vector pos = Vector(textOffSet.x, textOffSet.y, -Size.z/2);
     toFOV_XY(&pos, *FOV, o);
