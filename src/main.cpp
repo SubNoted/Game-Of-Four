@@ -66,8 +66,15 @@ Entity Cube;
 void setup() 
 {
     randomSeed(analogRead(23));
-    log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
 	
+    log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+    log_d("free heap: %d\n", ESP.getFreeHeap());
+
+    if(psramFound())
+    {
+        log_d("PSRAM Detected\n");
+    }
+
     ////////////init////////////////////
 
 	tft.init();
@@ -94,7 +101,7 @@ void setup()
     Cube.constA.z = 3;
 
     canvas.setColorDepth(16); 
-	cnvsPnr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/2);
+	cnvsPnr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT - 5);
     canvas.fillScreen(TFT_BLACK);
 	canvas.setSwapBytes(true);
 	//canvas.pushImage(0, 0, 120, 120, Ducksser, TFT_BLACK);
@@ -126,7 +133,7 @@ void drawFrame()
     // Cube.Angle.Equals(fixedTime*PI/240,fixedTime*PI/200, fixedTime*PI/150);
     // Cube.drawCube(40);
 
-    canvas.fillTriangle(CENTR_X - 100, CENTR_Y - 100, CENTR_X + 100, CENTR_Y - 100, CENTR_X + 100, CENTR_Y + 100, TFT_WHITE);
+    //canvas.fillTriangle(CENTR_X - 100, CENTR_Y - 100, CENTR_X + 100, CENTR_Y - 100, CENTR_X + 100, CENTR_Y + 100, TFT_GREEN);
     
 #if isSTARS
     for(i = 0; i < MAX_STARS; i++)
@@ -207,13 +214,14 @@ void loop()
 #else
 
     debugTimeStart = millis();
-    canvas.fillSprite(BG_COL);
+    canvas.fillSprite(TFT_RED);
     drawFrame();
+    //delay(10);
     debugRenderCheck = millis() - debugTimeStart;
     
     debugTimeStart = millis();
-    //canvas.pushSprite(0, 0);
-    tft.pushImageDMA(0,0, SCREEN_WIDTH, SCREEN_HEIGHT/2, cnvsPnr);
+    canvas.pushSprite(0, 0);
+    //tft.pushImageDMA(0,0, SCREEN_WIDTH, SCREEN_HEIGHT - 5, cnvsPnr);
     debugPushCheck = millis() - debugTimeStart;
 #endif
     Entity::processAllEntities(deltatime);
@@ -224,9 +232,9 @@ void loop()
 	if (millis() - framecheck > 1000)
 	{        
         // log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
-        log_d("FPS: %d\n", f);
-        log_d("Push time: %dms\n", debugPushCheck);
-        log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+        // log_d("FPS: %d\n", f);
+        // log_d("Push time: %dms\n", debugPushCheck);
+        // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
 
 		framecheck = millis();
 		f = 0;
