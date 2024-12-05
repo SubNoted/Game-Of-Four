@@ -10,40 +10,18 @@
 #define CENTR_Y SCREEN_HEIGHT/2
 
 #define SCREEN_ROTATION 0 //default: landscape
-#define isSPLIT_SCREEN false //use split screen algorithm? //in best cases gives only 24 fps
-#define SCREEN_SPLIT 2 //to save RAM
+
 float FOV = PI/2, last_FOV = 0;
 
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite canvas = TFT_eSprite(&tft);
-TFT_eSprite txt = TFT_eSprite(&tft);
-TFT_eSprite cir = TFT_eSprite(&tft);
-
-TFT_eSprite sprite = TFT_eSprite(&tft);
-
+TFT_eSprite canvas1 = TFT_eSprite(&tft);
 uint16_t* cnvsPnr = nullptr;
+uint16_t* cnvsPnr1 = nullptr;
 
 
-uint16_t BG_COL = tft.color565(194,144,195);
-// #define BG_COL TFT_BLUE//tft.color565(255,220,220)
-
-//////////
-
-//////////
-
-#define isSTARS false
-#define MAX_STARS 16
-typedef struct Particle {
-    uint16_t x, y, z, size, rotation;
-    uint8_t phase = 0;
-    const uint8_t maxPhase = 180;
-    bool set = false;
-    TFT_eSprite spr = TFT_eSprite(&tft);
-} Particle;
-#if isSTARS
-Particle star[MAX_STARS];
-#endif
+uint16_t BG_COL = tft.color565(194,144,195); //test color
 
 ////////tools/////////
 unsigned long framecheck = 0, fixedTime = 0, clearTime = 0, last4deltaTime = 0;
@@ -53,14 +31,10 @@ String str = "lol";
 #define isDEBUG_MODE true
 
 uint8_t f = 0, tps = 0, i = 0;
-float normalSin(float x)//from 0 to 1 on PI
+float normalSin(float x)//from 0 to 1 on PI //todo to physics engine
 {
     return pow(sin(x/2), 2);
 }
-
-///////////////ENTITIES/////////////////
-#define MAX_UI 8
-Entity Cube;
 
 ////////////////SETUP/////////////////////////////////
 void setup() 
@@ -70,7 +44,7 @@ void setup()
     log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
     log_d("free heap: %d\n", ESP.getFreeHeap());
 
-    if(psramFound())
+    if(psramFound())//todo find one
     {
         log_d("PSRAM Detected\n");
     }
@@ -85,30 +59,21 @@ void setup()
 	tft.fillScreen(TFT_WHITE);
     tft.setSwapBytes(true);
 
-//screen sprite to split
-// #if isSPLIT_SCREEN
-// 	canvas.setColorDepth(16);
-// 	canvas.createSprite(SCREEN_WIDTH/SCREEN_SPLIT, SCREEN_HEIGHT);
-//     canvas.fillScreen(TFT_BLACK);
-// 	canvas.setSwapBytes(true);
-// #endif
-
-    Entity::initALL(&sprite, SCREEN_WIDTH, SCREEN_HEIGHT, &FOV, &last_FOV, &BG_COL);
-    Cube.init();
+    // Entity::initALL(&sprite, SCREEN_WIDTH, SCREEN_HEIGHT, &FOV, &last_FOV, &BG_COL);
+    // Cube.init();
     
     last4deltaTime = millis();
 
-    Cube.O.Equals(SCREEN_WIDTH/2, -50, -160);
-    Cube.constA.z = 3;
+    // Cube.O.Equals(SCREEN_WIDTH/2, -50, -160);
+    // Cube.constA.z = 3;
 
-    canvas.setColorDepth(12); 
-	cnvsPnr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/2);
-    log_d("Size of canvas: %d", sizeof(canvas));
+    canvas.setColorDepth(16); 
+    canvas1.setColorDepth(16); 
+	cnvsPnr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT-20);
+	cnvsPnr1 = (uint16_t*)canvas1.createSprite(SCREEN_WIDTH, 20);
     canvas.fillScreen(TFT_BLACK);
 	canvas.setSwapBytes(true);
-	//canvas.pushImage(0, 0, 120, 120, Ducksser, TFT_BLACK);
-    //tft.pushImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, clouds);
-    //canvas.pushSprite(0,0, TFT_BLACK);
+	canvas1.setSwapBytes(true);
 
     tft.startWrite();
 }
@@ -137,27 +102,6 @@ void drawFrame()
 
     //canvas.fillTriangle(CENTR_X - 100, CENTR_Y - 100, CENTR_X + 100, CENTR_Y - 100, CENTR_X + 100, CENTR_Y + 100, TFT_GREEN);
     
-#if isSTARS
-    for(i = 0; i < MAX_STARS; i++)
-        if (star[i].phase > 0)
-        {
-            star[i].spr.fillSprite(TFT_BLUE);
-            if (star[i].phase == 1 || star[i].x == 0 || star[i].y == 0)
-            {
-                star[i].spr.pushSprite(star[i].x, star[i].y);
-                star[i].spr.deleteSprite();
-            }
-            star[i].phase--;
-            star[i].x--;
-            star[i].y--;
-            star[i].z = pow(sin((float)star[i].phase*PI/star[i].maxPhase), 2)*star[i].size;
-            star[i].spr.fillCircle(star[i].size*2, star[i].size*2, star[i].z, TFT_WHITE);
-            //star[i].spr.setPivot(star[i].x, star[i].y);
-            //star[i].spr.pushImage(0, 0, 33, 33, starImage);
-            star[i].spr.pushSprite(star[i].x, star[i].y);
-            //star[i].spr.pushRotated(&canvas, star[i].phase);
-        }
-#endif
 }
 
 unsigned long debugTimeStart = 0, debugPushCheck = 0, debugRenderCheck = 0; 
@@ -171,51 +115,10 @@ void loop()
     last4deltaTime = millis();
 
 
-//spawn particles every 30 frames
-#if isSTARS
-    if(t%30==0)
-        for(i = 0; i < MAX_STARS; i++)
-            if (star[i].phase == 0)
-            {
-                star[i].phase = star[i].maxPhase;
-                star[i].size = random(4,10);
-                star[i].spr.setColorDepth(8);
-	            star[i].spr.setSwapBytes(true);
-                star[i].spr.createSprite(star[i].size*4, star[i].size*4);
-                //star[i].spr.createSprite(35, 35);
-                star[i].x = random(SCREEN_WIDTH/2) + (i%2)*SCREEN_WIDTH/2;
-                star[i].y = random(SCREEN_HEIGHT/2) + ((int)(i/2)%2)*SCREEN_HEIGHT/2;
-                break;
-            }
-#endif
-    
-	//digitalWrite(PC13, ts.touched());
-    /*str = "";
-	if (Serial.available()) {
-		str = Serial.readStringUntil('\n'); // Чтение команды из последовательного порта
-		//processCommand(command); // Обработка полученной команды
-		str.trim();
-        debugtxt[5] = str;
-	}
-    str = "";*/
-	
-	//tft.pushImage(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, clouds);
-	//analogWrite(PA11, sin((float)t/20)*sin((float)t/20)*255);
-
-
-//split frame algoritm
-#if isSPLIT_SCREEN
-    for (i = 0; i<SCREEN_SPLIT; i++)
-    {
-	    canvas.fillSprite(TFT_RED);
-        //scrn.pushImage(-SCREEN_WIDTH/SCREEN_SPLIT * i, 0, SCREEN_WIDTH, SCREEN_HEIGHT, clouds);
-	    //drawFrame();
-        //canvas.pushSprite(SCREEN_WIDTH/SCREEN_SPLIT * i, 45, TFT_BLACK);
-        tft.pushImageDMA8bit(0,SCREEN_HEIGHT/2 * i, SCREEN_WIDTH, SCREEN_HEIGHT/2, cnvsPnr);
-    }
-#else
-
+    //render
     debugTimeStart = millis();
+    canvas1.fillSprite(TFT_RED);
+
     canvas.fillSprite(TFT_RED);
     drawFrame();
     //delay(10);
@@ -223,19 +126,22 @@ void loop()
     
     debugTimeStart = millis();
     //canvas.pushSprite(0, 0);
-    tft.pushImageDMA12bit(0,SCREEN_HEIGHT/4, SCREEN_WIDTH, SCREEN_HEIGHT/2, cnvsPnr);
+    //while (tft.dmaBusy());
+        tft.pushImageDMA(0,0, SCREEN_WIDTH, SCREEN_HEIGHT-20, cnvsPnr);
+    //while (tft.dmaBusy());
+        tft.pushImageDMA(0, 0, SCREEN_WIDTH, 20, cnvsPnr1);
     debugPushCheck = millis() - debugTimeStart;
-#endif
-    Entity::processAllEntities(deltatime);
+
+    //Entity::processAllEntities(deltatime);
 
 /////debug
 
     f++;
 	if (millis() - framecheck > 1000)
 	{        
-        // log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
-        // log_d("FPS: %d\n", f);
-        // log_d("Push time: %dms\n", debugPushCheck);
+        //log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
+        log_d("FPS: %d\n", f);
+        log_d("Push time: %dms\n", debugPushCheck);
         // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
 
 		framecheck = millis();
