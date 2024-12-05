@@ -311,10 +311,10 @@ const PROGMEM fontinfo fontdata [] = {
 #define TFT_OLIVE       0x7BE0      /* 128, 128,   0 */
 #define TFT_LIGHTGREY   0xD69A      /* 211, 211, 211 */
 #define TFT_DARKGREY    0x7BEF      /* 128, 128, 128 */
-#define TFT_BLUE        0x001F      /*   0,   0, 255 */
-#define TFT_GREEN       0x07E0      /*   0, 255,   0 */
+#define TFT_BLUE        0x001F      /*   0,   0, 255 */ //0b 0000 0000 0001 1111
+#define TFT_GREEN       0x07E0      /*   0, 255,   0 */ //0b 0000 0111 1110 0000
 #define TFT_CYAN        0x07FF      /*   0, 255, 255 */
-#define TFT_RED         0xF800      /* 255,   0,   0 */
+#define TFT_RED         0xF800      /* 255,   0,   0 */ //0b 1111 1000 0000 0000
 #define TFT_MAGENTA     0xF81F      /* 255,   0, 255 */
 #define TFT_YELLOW      0xFFE0      /* 255, 255,   0 */
 #define TFT_WHITE       0xFFFF      /* 255, 255, 255 */
@@ -787,7 +787,7 @@ class TFT_eSPI : public Print { friend class TFT_eSprite; // Sprite class has ac
 #if defined (ESP32) // ESP32 only at the moment
            // For case where pointer is a const and the image data must not be modified (clipped or byte swapped)
   void     pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t const* data);
-  void     pushImageDMA8bit(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t const* data);
+  void     pushImageDMA12bit(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t const* data);//todo replace to basic pushdma
 #endif
            // Push a block of pixels into a window set up using setAddrWindow()
   void     pushPixelsDMA(uint16_t* image, uint32_t len);

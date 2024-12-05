@@ -81,7 +81,8 @@ void setup()
     tft.initDMA();
 	tft.setRotation(SCREEN_ROTATION);
 	//tft.fillScreen(tft.color565(255,220,220));
-	tft.fillScreen(BG_COL);
+	//tft.fillScreen(BG_COL);
+	tft.fillScreen(TFT_WHITE);
     tft.setSwapBytes(true);
 
 //screen sprite to split
@@ -100,8 +101,9 @@ void setup()
     Cube.O.Equals(SCREEN_WIDTH/2, -50, -160);
     Cube.constA.z = 3;
 
-    canvas.setColorDepth(16); 
-	cnvsPnr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT - 5);
+    canvas.setColorDepth(12); 
+	cnvsPnr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/2);
+    log_d("Size of canvas: %d", sizeof(canvas));
     canvas.fillScreen(TFT_BLACK);
 	canvas.setSwapBytes(true);
 	//canvas.pushImage(0, 0, 120, 120, Ducksser, TFT_BLACK);
@@ -220,8 +222,8 @@ void loop()
     debugRenderCheck = millis() - debugTimeStart;
     
     debugTimeStart = millis();
-    canvas.pushSprite(0, 0);
-    //tft.pushImageDMA(0,0, SCREEN_WIDTH, SCREEN_HEIGHT - 5, cnvsPnr);
+    //canvas.pushSprite(0, 0);
+    tft.pushImageDMA12bit(0,SCREEN_HEIGHT/4, SCREEN_WIDTH, SCREEN_HEIGHT/2, cnvsPnr);
     debugPushCheck = millis() - debugTimeStart;
 #endif
     Entity::processAllEntities(deltatime);

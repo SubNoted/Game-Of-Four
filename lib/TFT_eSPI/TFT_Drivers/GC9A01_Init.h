@@ -54,8 +54,8 @@
 
   writecommand(0x3A); //color mode 
   //writedata(0x06); // 18-bit color mode
-  //writedata(0x05); // 16-bit color mode
-  writedata(0x03); // 12-bit color mode
+  writedata(0x05); // 16-bit color mode
+  //writedata(0x03); // 12-bit color mode
 
   writecommand(0x90);
   writedata(0x08);

@@ -1526,9 +1526,21 @@ void TFT_eSprite::fillSprite(uint32_t color)
       }
       else fillRect(_vpX, _vpY, _xWidth, _yHeight, color);
     }
+    else if (_bpp == 12) {
+      color = 
+                      /*rrrr rggg gggb bbbb*/
+      (color & 0xF000 /*1111 0000 0000 0000*/)>>4 | 
+      (color & 0x0780 /*0000 0111 1000 0000*/)>>3 | 
+      (color & 0x001E /*0000 0000 0001 1110*/)>>1;
+      memset(_img8, (uint8_t)color, _iwidth * _yHeight * 1.5);
+    }
     else if (_bpp == 8)
     {
-      color = (color & 0xE000)>>8 | (color & 0x0700)>>6 | (color & 0x0018)>>3;
+      color = 
+                      /*rrrr rggg gggb bbbb*/
+      (color & 0xE000 /*1110 0000 0000 0000*/)>>8 | 
+      (color & 0x0700 /*0000 0111 0000 0000*/)>>6 | 
+      (color & 0x0018 /*0000 0000 0001 1000*/)>>3;
       memset(_img8, (uint8_t)color, _iwidth * _yHeight);
     }
     else if (_bpp == 4)

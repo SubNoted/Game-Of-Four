@@ -673,7 +673,7 @@ void TFT_eSPI::pushImageDMA(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t
 
   spiBusyCheck++;
 }
-void TFT_eSPI::pushImageDMA8bit(int32_t x, int32_t y, int32_t w, int32_t h, uint8_t const* image)
+void TFT_eSPI::pushImageDMA12bit(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t const* image)
 {
   if ((w == 0) || (h == 0) || (!DMA_Enabled)) return;
 
