@@ -1,8 +1,11 @@
 #include <Arduino.h>
 
+#include <memory>
+
 #include <SPI.h>
 #include <TFT_eSPI.h> 
-#include "entity.h"
+
+#include <lowPoly.h>
 
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 240
