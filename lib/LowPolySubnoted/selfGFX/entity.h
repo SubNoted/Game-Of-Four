@@ -1,5 +1,8 @@
-#include <TFT_eSPI.h> 
-#include <vector.h>
+#ifndef _ENTITY_
+#define _ENTITY_
+
+#include <TFT_eSPI.h>
+#include "selfGFX/vector.h"
 
 class Entity
 {
@@ -117,3 +120,5 @@ public:
     bool isTouched(Vector2 touch);
     
 };
+
+#endif

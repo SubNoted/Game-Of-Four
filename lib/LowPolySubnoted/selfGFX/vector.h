@@ -1,3 +1,7 @@
+#ifndef _VECTOR_
+#define _VECTOR_
+
+
 class Vector
 {
     public:
@@ -107,3 +111,5 @@ class Bounding2
 
     void Reset();
 };
+
+#endif
