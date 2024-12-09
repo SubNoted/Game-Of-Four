@@ -32,3 +32,16 @@ void Tscene::enter() {
 void Tscene::exit() {
     // Clean up menu resources
 }
+
+
+//////////////private
+void Tscene::addVertex(Vector v)
+{
+    vertices.push_back(v);
+}
+
+
+void Tscene::clearVertices()
+{
+    vertices.clear();
+}
