@@ -69,7 +69,7 @@ void setup()
 	tft.setRotation(SCREEN_ROTATION);
 	//tft.fillScreen(tft.color565(255,220,220));
 	//tft.fillScreen(BG_COL);
-	tft.fillScreen(TFT_WHITE);
+	tft.fillScreen(TFT_RED);
     tft.setSwapBytes(false);
 
     // Entity::initALL(&sprite, SCREEN_WIDTH, SCREEN_HEIGHT, &FOV, &last_FOV, &BG_COL);
