@@ -52,7 +52,9 @@
 //#define ILI9481_DRIVER
 //#define ILI9486_DRIVER
 //#define ILI9488_DRIVER     // WARNING: Do not connect ILI9488 display SDO to MISO if other devices share the SPI bus (TFT SDO does NOT tristate when CS is high)
-#define ST7789_DRIVER      // Full configuration option, define additional parameters below for this display
+
+
+//#define ST7789_DRIVER      // Full configuration option, define additional parameters below for this display
 //#define ST7789_2_DRIVER    // Minimal configuration option, define additional parameters below for this display
 //#define R61581_DRIVER
 //#define RM68140_DRIVER
@@ -63,7 +65,7 @@
 //#define SSD1963_800ALT_DRIVER
 //#define ILI9225_DRIVER
 
-//#define GC9A01_DRIVER
+#define GC9A01_DRIVER
 
 // Some displays support SPI reads via the MISO pin, other displays have a single
 // bi-directional SDA pin and the library will try to read this via the MOSI line.
@@ -225,7 +227,7 @@
 
 #define TFT_MOSI 13//15 // In some display driver board, it might be written as "SDA" and so on.
 #define TFT_SCLK 14
-#define TFT_CS   -1  // Chip select control pin
+#define TFT_CS   15  // Chip select control pin
 #define TFT_DC   27  // Data Command control pin
 #define TFT_RST  26//33  // Reset pin (could connect to Arduino RESET pin)
 //#define TFT_BL   22  // LED back-light
@@ -366,10 +368,10 @@
 //#define SPI_FREQUENCY  27000000
 // #define SPI_FREQUENCY  40000000
 // #define SPI_FREQUENCY  55000000 // STM32 SPI1 only (SPI2 maximum is 27MHz)
- #define SPI_FREQUENCY  79999000 // well 80 MHz doesn't work with st7789 display
+ #define SPI_FREQUENCY  80000000 
 
 // Optional reduced SPI frequency for reading TFT
-#define SPI_READ_FREQUENCY  80000000
+#define SPI_READ_FREQUENCY  20000000
 
 // The XPT2046 requires a lower SPI clock rate of 2.5MHz so we define that here:
 #define SPI_TOUCH_FREQUENCY  2500000
@@ -377,7 +379,7 @@
 // The ESP32 has 2 free SPI ports i.e. VSPI and HSPI, the VSPI is the default.
 // If the VSPI port is in use and pins are not accessible (e.g. TTGO T-Beam)
 // then uncomment the following line:
-#define USE_HSPI_PORT
+//#define USE_HSPI_PORT
 
 // Comment out the following #define if "SPI Transactions" do not need to be
 // supported. When commented out the code size will be smaller and sketches will
