@@ -10,11 +10,12 @@
 
 //dependencies
 
-#include "scene/sceneManager.h"
-#include "scene/scene.h"
-
-#include "selfGFX/vector.h"
 #include "selfGFX/entity.h"
+#include "selfGFX/vector.h"
+
+#include "scene/scene.h"
+#include "scene/sceneManager.h"
+
 
 
 
