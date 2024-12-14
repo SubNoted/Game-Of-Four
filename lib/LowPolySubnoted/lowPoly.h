@@ -1,6 +1,7 @@
 #ifndef _LOWPOLY_
 #define _LOWPOLY_
 
+#define DEBUG_MODE true
 #define LOW_POLY_VERSION "0.0.1"
 
 //Standard support
