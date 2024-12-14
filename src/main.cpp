@@ -19,10 +19,8 @@ float FOV = PI/2, last_FOV = 0;
 
 
 TFT_eSPI tft = TFT_eSPI();
-TFT_eSprite canvas = TFT_eSprite(&tft);
-TFT_eSprite canvas1 = TFT_eSprite(&tft);
-uint16_t* cnvsPtr = nullptr;
-uint16_t* cnvsPtr1 = nullptr;
+TFT_eSprite canvas[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft)};
+uint16_t* cnvsPtr[2];
 
 
 uint16_t BG_COL = tft.color565(194,144,195); //test color
@@ -31,7 +29,7 @@ uint16_t BG_COL = tft.color565(194,144,195); //test color
 #include "sceneTest.h"
 #include <bits/unique_ptr.h>
 
-/*static*/ SceneManager sceneManager;
+SceneManager sceneManager;
 
 ////////tools/////////
 unsigned long statusCheckTime = 0, fixedTime = 0, clearTime = 0, last4deltaTime = 0;
@@ -80,22 +78,22 @@ void setup()
     // Cube.O.Equals(SCREEN_WIDTH/2, -50, -160);
     // Cube.constA.z = 3;
 
-    canvas.setColorDepth(16); 
-    canvas1.setColorDepth(16); 
-	cnvsPtr = (uint16_t*)canvas.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
-	cnvsPtr1 = (uint16_t*)canvas1.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
-    canvas.fillScreen(TFT_RED);
-    canvas1.fillScreen(TFT_RED);
-	canvas.setSwapBytes(true);
-	canvas1.setSwapBytes(true);
+    canvas[0].setColorDepth(16); 
+    canvas[1].setColorDepth(16); 
+	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
+	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
+    canvas[0].fillScreen(TFT_RED);
+    canvas[1].fillScreen(TFT_RED);
+	canvas[0].setSwapBytes(true);
+	canvas[1].setSwapBytes(true);
     
-    canvas1.setViewport(0, -SCREEN_HEIGHT/SPLIT_SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT);
+    // canvas[1].setViewport(0, -SCREEN_HEIGHT/SPLIT_SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, 1, NULL,  0); 
     delay(500);
 
     //startscene
-    sceneManager.init(&canvas, &canvas1, &cnvsPtr, &cnvsPtr1, &tft);
+    sceneManager.init(canvas, cnvsPtr, &tft);
     sceneManager.changeScene(std::unique_ptr<Tscene>(new Tscene()));
 }
 

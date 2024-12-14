@@ -1,14 +1,15 @@
 #ifndef SCENE_MANAGER_H
 #define SCENE_MANAGER_H
 
+
 #include <memory>
 #include "scene.h"
 
 class SceneManager {
 public:
-    void init(TFT_eSprite* canvas, TFT_eSprite* canvas1, uint16_t** cnvsPtr, uint16_t** cnvsPtr1, TFT_eSPI* tft);
+    void init(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft);
     void changeScene(std::unique_ptr<Scene> newScene);
-    void update(float deltaTime);
+    void update();
     void render();
     void exit();
 
