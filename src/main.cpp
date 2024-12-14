@@ -15,6 +15,7 @@
 #define SCREEN_ROTATION 0 //default: landscape
 #define SPLIT_SCREEN 2
 
+
 float FOV = PI/2, last_FOV = 0;
 
 
@@ -31,15 +32,9 @@ uint16_t BG_COL = tft.color565(194,144,195); //test color
 
 SceneManager sceneManager;
 
-////////tools/////////
-unsigned long statusCheckTime = 0, fixedTime = 0, clearTime = 0, last4deltaTime = 0;
-//unsigned long 
-float deltaTime = 0;
-String str = "lol";
 #define MAX_CONSL 6
 #define isDEBUG_MODE true
 
-uint8_t frames = 0, physicsCalls = 0, i = 0;
 float normalSin(float x)//from 0 to 1 on PI //todo to physics engine
 {
     return pow(sin(x/2), 2);
@@ -67,13 +62,13 @@ void setup()
 	tft.setRotation(SCREEN_ROTATION);
 	//tft.fillScreen(tft.color565(255,220,220));
 	//tft.fillScreen(BG_COL);
-	tft.fillScreen(TFT_RED);
-    tft.setSwapBytes(false);
 
+	tft.fillScreen(TFT_RED);
+    delay(300);
+    tft.setSwapBytes(false);
     // Entity::initALL(&sprite, SCREEN_WIDTH, SCREEN_HEIGHT, &FOV, &last_FOV, &BG_COL);
     // Cube.init();
     
-    last4deltaTime = millis();
 
     // Cube.O.Equals(SCREEN_WIDTH/2, -50, -160);
     // Cube.constA.z = 3;
@@ -111,7 +106,7 @@ void drawFrame()
     // cube.fillSprite(TFT_BLACK);
     // drawCube(Vector(CENTR_X,CENTR_Y, sin(float(t-1)/5)*(20)), 75, Vector((t-1)*PI/240, (t-1)*PI/200, (t-1)*PI/150), BG_COL);//t*PI/45
     // drawCube(Vector(CENTR_X,CENTR_Y, sin(float(t)/5)*(20)), 75, Vector(t*PI/240, t*PI/200, t*PI/150), TFT_WHITE);//t*PI/45
-    // cube.pushToSprite(&canvas, CENTR_X,CENTR_Y, TFT_BLACK);
+    // cube.pushToSprite(&canvas[0], CENTR_X,CENTR_Y, TFT_BLACK);
     // cube.deleteSprite();
 
     // Cube.O.Plus((CENTR_X - Cube.O.x)*deltaTime/200, (CENTR_Y -  20 - Cube.O.y)*deltaTime/400);
@@ -123,48 +118,17 @@ void drawFrame()
     
 }
 
-unsigned long debugTimeStart = 0, debugPushCheck = 0, debugRenderCheck = 0; 
-unsigned long frameTimeStart = 0;
 void loop() 
 {
-    {
-        fixedTime = millis()*60/1000; //float which every integer is 1/60 of second
-        last_FOV = FOV;
-        deltaTime = millis() - last4deltaTime;
-        if (deltaTime > 100)
-            deltaTime = 100;
-        last4deltaTime = millis();
-
-
-        //render
-        
-        debugTimeStart = micros();
-        sceneManager.render();
-        debugPushCheck = micros() - debugTimeStart;
-        //Entity::processAllEntities(deltaTime);
-
-    /////debug
-
-        frames++;
-        if (millis() - statusCheckTime > 1000)
-        {        
-            //log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
-            log_d("FPS: %d\n", frames);
-            log_d("PhysCallsPS: %d\n", physicsCalls);
-            log_d("Push time: %dms\n", debugPushCheck);
-            // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
-
-            statusCheckTime = millis();
-            frames = 0;
-            physicsCalls = 0;
-        }
-    }
+    //last_FOV = FOV;
+    //render
+    sceneManager.render(); //call of this func = +~2mcs
+    //Entity::processAllEntities(deltaTime);
 }
 
 void core0(void * pvParameters){
     while(1){
-        physicsCalls++;
-        sceneManager.update(deltaTime);
+        sceneManager.update();
         delay(1000);
         log_d("00");
     }
