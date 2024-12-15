@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include <memory>
+#include "esp_task_wdt.h"
 
 #include <SPI.h>
 #include <TFT_eSPI.h> 
@@ -12,7 +13,7 @@
 #define CENTR_X SCREEN_WIDTH/2
 #define CENTR_Y SCREEN_HEIGHT/2
 
-#define SCREEN_ROTATION 0 //default: landscape
+#define SCREEN_ROTATION 2 //default: landscape
 #define SPLIT_SCREEN 2
 
 
@@ -24,16 +25,11 @@ TFT_eSprite canvas[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft)};
 uint16_t* cnvsPtr[2];
 
 
-uint16_t BG_COL = tft.color565(194,144,195); //test color
-
 /////////scenes////////////
 #include "sceneTest.h"
 #include <bits/unique_ptr.h>
 
 SceneManager sceneManager;
-
-#define MAX_CONSL 6
-#define isDEBUG_MODE true
 
 float normalSin(float x)//from 0 to 1 on PI //todo to physics engine
 {
@@ -77,14 +73,12 @@ void setup()
     canvas[1].setColorDepth(16); 
 	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
 	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
-    canvas[0].fillScreen(TFT_RED);
-    canvas[1].fillScreen(TFT_RED);
 	canvas[0].setSwapBytes(true);
 	canvas[1].setSwapBytes(true);
     
-    // canvas[1].setViewport(0, -SCREEN_HEIGHT/SPLIT_SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT);
+    canvas[1].setViewport(0, -SCREEN_HEIGHT/SPLIT_SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, 1, NULL,  0); 
+    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
     delay(500);
 
     //startscene
@@ -122,14 +116,16 @@ void loop()
 {
     //last_FOV = FOV;
     //render
+    
     sceneManager.render(); //call of this func = +~2mcs
+
     //Entity::processAllEntities(deltaTime);
 }
 
 void core0(void * pvParameters){
-    while(1){
+    esp_task_wdt_add(nullptr);
+    for (;;) {
+        esp_task_wdt_reset();
         sceneManager.update();
-        delay(1000);
-        log_d("00");
     }
 }

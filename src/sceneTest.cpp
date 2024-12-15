@@ -1,33 +1,40 @@
 #include "sceneTest.h"
 
-void Tscene::update(float deltaTime) 
+
+uint16_t BG_COL = Scene::tft->color565(194,144,195); //test color
+
+
+
+
+float size = 50, x = 0, y = 0;
+void Tscene::update(uint32_t deltaTime) 
 {
-    int a = 0;
+    x = SCREEN_WIDTH / 2;
+    y = SCREEN_HEIGHT / 2 + sin((float)millis()*0.001)*100;
+    
+    READY_TO_RENDER = true;
 }
 
 void Tscene::render() 
 {
-    
-    //canvas.pushSprite(0, 0);
-    //while (tft.dmaBusy());
-    //if (millis() - debugTimeStart > 1000)
-    {
-        //canvas->fillScreen(TFT_RED);
-        canvas[0].fillScreen(TFT_GREEN);
-        tft->pushImageDMA(0,0, SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN, cnvsPtr[0]);
+    for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) {
+        canvas[cnvsNum].fillScreen(BG_COL);
+        canvas[cnvsNum].fillCircle(x, y, size, TFT_RED);
+        
+        tft->pushImageDMA(0,SCREEN_HEIGHT/SPLIT_SCREEN*cnvsNum, SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN, cnvsPtr[cnvsNum]);
     }
-    //delay(10);
-    //canvas1.fillSprite(TFT_RED+10);
-    //while (tft.dmaBusy());
-    //if (millis() - frameTimeStart > 1000)
-    {
-        canvas[1].fillScreen(TFT_ORANGE);
-        tft->pushImageDMA(0, SCREEN_HEIGHT/SPLIT_SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN, cnvsPtr[1]);
-    }
-    //log_d("render\n");
 }
 
+
 void Tscene::enter() {
+    
+    // circle.setColorDepth(16);
+    // circle.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/2);
+    // circle.fillScreen(TFT_TRANSPARENT);
+    // circle.setSwapBytes(true);
+    
+    canvas[0].fillScreen(TFT_BLUE * 0.5);
+    canvas[1].fillScreen(TFT_BLUE * 0.5);
 }
 
 void Tscene::exit() {
