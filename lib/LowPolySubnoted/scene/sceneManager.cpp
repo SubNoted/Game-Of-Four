@@ -32,6 +32,11 @@ void SceneManager::update() {
     physicsCalls++;
 #endif
 
+    deltaTime = millis() - last4deltaTime;
+    if (deltaTime > 100)
+        deltaTime = 100;
+    last4deltaTime = millis();
+
     if (currentScene) {
         currentScene->update(deltaTime);
     }
@@ -42,11 +47,6 @@ void SceneManager::render() {
     debugTimeStart = micros();
 #endif 
 
-    fixedTime = millis()*60/1000; //float which every integer is 1/60 of second //todo remove it
-    deltaTime = millis() - last4deltaTime;
-    if (deltaTime > 100)
-        deltaTime = 100;
-    last4deltaTime = millis();
 
     //render
     if (currentScene) {

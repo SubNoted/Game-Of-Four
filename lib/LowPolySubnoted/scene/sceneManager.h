@@ -17,8 +17,8 @@ private:
 
 
     ////////tools/////////
-    uint32_t fixedTime = 0, last4deltaTime = 0;
-    float deltaTime = 0;
+    uint32_t last4deltaTime = 0;
+    uint32_t deltaTime = 0;
     
 
 #if DEBUG_MODE
