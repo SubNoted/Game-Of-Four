@@ -17,6 +17,9 @@ public:
 
     static TFT_eSPI* tft;
 
+    static std::vector<Vector> vertecies;
+    static std::vector<Polygon> polygons;
+    
 protected:
 
 
@@ -33,12 +36,7 @@ protected:
     static uint16_t** cnvsPtr;
     
 
-    static const uint8_t SCREEN_HEIGHT = 240;
-    static const uint8_t SCREEN_WIDTH = 240;
-    static const uint8_t SPLIT_SCREEN = 2;
 
-    static std::vector<Vector> vertecies;
-    static std::vector<Vector> polygons;   
 
     static bool READY_TO_RENDER;     
 };

@@ -8,16 +8,7 @@
 
 #include <lowPoly.h>
 
-#define SCREEN_WIDTH 240
-#define SCREEN_HEIGHT 240
-#define CENTR_X SCREEN_WIDTH/2
-#define CENTR_Y SCREEN_HEIGHT/2
-
-#define SCREEN_ROTATION 2 //default: landscape
-#define SPLIT_SCREEN 2
-
-
-float FOV = PI/2, last_FOV = 0;
+#include <displayInfo.h>
 
 
 TFT_eSPI tft = TFT_eSPI();
@@ -55,7 +46,7 @@ void setup()
 
 	tft.init();
     tft.initDMA();
-	tft.setRotation(SCREEN_ROTATION);
+	tft.setRotation(SCRN_ROTATION);
 	//tft.fillScreen(tft.color565(255,220,220));
 	//tft.fillScreen(BG_COL);
 
@@ -66,17 +57,17 @@ void setup()
     // Cube.init();
     
 
-    // Cube.O.Equals(SCREEN_WIDTH/2, -50, -160);
+    // Cube.O.Equals(SCRN_WIDTH/2, -50, -160);
     // Cube.constA.z = 3;
 
     canvas[0].setColorDepth(16); 
     canvas[1].setColorDepth(16); 
-	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
-	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCREEN_WIDTH, SCREEN_HEIGHT/SPLIT_SCREEN);
+	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCRN_HEIGHT, SCRN_HEIGHT/SPLIT_SCREEN);
+	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCRN_HEIGHT, SCRN_HEIGHT/SPLIT_SCREEN);
 	canvas[0].setSwapBytes(true);
 	canvas[1].setSwapBytes(true);
     
-    canvas[1].setViewport(0, -SCREEN_HEIGHT/SPLIT_SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT);
+    canvas[1].setViewport(0, -SCRN_HEIGHT/SPLIT_SCREEN, SCRN_HEIGHT, SCRN_HEIGHT);
 
     xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
     delay(500);

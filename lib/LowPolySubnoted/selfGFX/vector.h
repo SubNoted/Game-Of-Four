@@ -1,6 +1,8 @@
 #ifndef _VECTOR_
 #define _VECTOR_
 
+// #include <lowPoly.h>
+#include <displayInfo.h>
 
 class Vector
 {
