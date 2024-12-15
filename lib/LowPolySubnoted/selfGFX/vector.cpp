@@ -393,6 +393,104 @@ void Vector2::Reset()
     this->y = 0;
 }
 
+////////////////////////////////////////////UnitVector/////////////////////////////////////////
+
+UnitVector::UnitVector()
+{
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+}
+UnitVector::UnitVector(uint8_t x, uint8_t y, uint8_t z)
+{
+    this->x = x;
+    this->y = y;
+    this->z = z;
+}
+UnitVector::UnitVector(Vector& a, Vector& b, Vector& c)
+{
+    Vector ab = b.Delta(a), ac = c.Delta(a);
+    this->x = uint8_t((ab.y * ac.z - ab.z * ac.y)*256);
+    this->y = uint8_t((ab.z * ac.x - ab.x * ac.z)*256);
+    this->z = uint8_t((ab.x * ac.y - ab.y * ac.x)*256);
+}
+
+bool UnitVector::isEqual(UnitVector v)
+{
+    if (this->x == v.x && this->y == v.y && this->z == v.z)
+        return true;
+    return false;
+}
+bool UnitVector::isExist()
+{
+    if (this->x != 0 || this->y != 0 || this->z != 0)
+        return true;
+    return false;
+}
+void UnitVector::Equals(uint8_t x, uint8_t y, uint8_t z)
+{
+    this->x = x;
+    this->y = y;
+    this->z = z;
+}
+float UnitVector::ScalarProd(UnitVector v)
+{
+    return ((*this).x*v.x + (*this).y*v.y + (*this).z*v.z);
+}
+void UnitVector::setRotation(Vector d)
+{
+    this->Equals(1, 0, 0);
+    this->Equals(
+        this->x * cos(d.x) - this->y * sin(d.x),
+        this->x * sin(d.x) + this->y * cos(d.x),
+        this->z
+    );
+    
+    this->Equals(
+        this->x * cos(d.y) - this->z * sin(d.y),
+        this->y,
+        this->x * sin(d.y) + this->z * cos(d.y)
+    );
+    
+    this->Equals(
+        this->x,
+        this->z * sin(d.z) + this->y * cos(d.z),
+        this->z * cos(d.z) - this->y * sin(d.z)
+    );
+}
+void UnitVector::Rotate(Vector d)
+{
+    this->Equals(
+        this->x * cos(d.x) - this->y * sin(d.x),
+        this->x * sin(d.x) + this->y * cos(d.x),
+        this->z
+    );
+    
+    this->Equals(
+        this->x * cos(d.y) - this->z * sin(d.y),
+        this->y,
+        this->x * sin(d.y) + this->z * cos(d.y)
+    );
+    
+    this->Equals(
+        this->x,
+        this->z * sin(d.z) + this->y * cos(d.z),
+        this->z * cos(d.z) - this->y * sin(d.z)
+    );
+}
+void UnitVector::Reverse()
+{
+    this->x = -this->x;
+    this->y = -this->y;
+    this->z = -this->z;
+}
+void UnitVector::Reset()
+{
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+}
+
 ////////////////////////////////////////////BOUNDING2/////////////////////////////////////////////////////
 
 Bounding2::Bounding2()

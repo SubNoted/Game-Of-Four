@@ -95,6 +95,29 @@ class Vector2
     void Reset();
 };
 
+class UnitVector
+{
+    public:
+    uint8_t x, y, z;
+    UnitVector(void);
+    UnitVector(uint8_t x, uint8_t y, uint8_t z);
+    UnitVector(Vector& a, Vector& b, Vector& c);
+
+    bool isEqual(UnitVector v),
+        isExist();
+
+    void Equals(UnitVector v),
+        Equals(uint8_t x, uint8_t y, uint8_t z);
+
+    float ScalarProd(UnitVector v);
+
+    void setRotation(Vector alp);
+    void Rotate(Vector alp);
+    void Reverse();
+    void Reset();
+  
+};
+
 class Bounding2
 {
     public:
