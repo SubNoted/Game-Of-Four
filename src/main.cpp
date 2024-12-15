@@ -53,7 +53,7 @@ void setup()
 	tft.fillScreen(TFT_RED);
     delay(300);
     tft.setSwapBytes(false);
-    // Entity::initALL(&sprite, SCREEN_WIDTH, SCREEN_HEIGHT, &FOV, &last_FOV, &BG_COL);
+    // Entity::initALL(&sprite, SCRN_WIDTH, SCRN_HEIGHT, &FOV, &last_FOV, &BG_COL);
     // Cube.init();
     
 
@@ -69,12 +69,14 @@ void setup()
     
     canvas[1].setViewport(0, -SCRN_HEIGHT/SPLIT_SCREEN, SCRN_HEIGHT, SCRN_HEIGHT);
 
-    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
     delay(500);
 
     //startscene
     sceneManager.init(canvas, cnvsPtr, &tft);
     sceneManager.changeScene(std::unique_ptr<Tscene>(new Tscene()));
+    
+    
+    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
 }
 
 void drawFrame()
