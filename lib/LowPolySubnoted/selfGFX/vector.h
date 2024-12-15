@@ -11,6 +11,7 @@ class Vector
     Vector(void);
     Vector(float x, float y, float z);
     Vector(float x, float y);
+    Vector(float x);
 
     bool isEqual(Vector v),
         isEqual(Vector v, float r),
@@ -48,6 +49,11 @@ class Vector
 
     void setRotation(Vector alp);
     void Rotate(Vector alp);
+    Vector setRotation(Vector alp, Vector o);
+    Vector Rotate(Vector alp, Vector o);
+
+    Vector toFOV_XY(const float& fov);
+
     void Reverse();
     void Round();
     void Reset();
@@ -97,13 +103,14 @@ class Vector2
     void Reset();
 };
 
+#include <cstdint>  // Include the cstdint library for uint8_t type
 class UnitVector
 {
-    public:
+public:
     uint8_t x, y, z;
     UnitVector(void);
     UnitVector(uint8_t x, uint8_t y, uint8_t z);
-    UnitVector(Vector& a, Vector& b, Vector& c);
+    UnitVector(Vector& a, Vector& b, Vector& c);//normal
 
     bool isEqual(UnitVector v),
         isExist();
@@ -111,14 +118,14 @@ class UnitVector
     void Equals(UnitVector v),
         Equals(uint8_t x, uint8_t y, uint8_t z);
 
-    float ScalarProd(UnitVector v);
+    uint8_t ScalarProd(UnitVector v);
 
     void setRotation(Vector alp);
     void Rotate(Vector alp);
     void Reverse();
     void Reset();
-  
 };
+
 
 class Bounding2
 {
