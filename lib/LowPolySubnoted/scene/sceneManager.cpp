@@ -17,12 +17,19 @@ void SceneManager::init(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft)
     last4deltaTime = millis();
 }
 
+std::vector<Vector> Scene::vertecies = std::vector<Vector>();
+std::vector<Polygon> Scene::polygons = std::vector<Polygon>();
 
 void SceneManager::changeScene(std::unique_ptr<Scene> newScene) {
     if (currentScene) {
+        Scene::vertecies.clear();
         currentScene->exit();
     }
     currentScene = std::move(newScene);
+
+    // Scene::vertecies.reserve(8);
+    // Scene::polygons.reserve(12);
+
     currentScene->setSceneManager(this);
     currentScene->enter();
 }
@@ -62,7 +69,9 @@ void SceneManager::render() {
         //log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
         log_d("FPS: %d", frameCalls);
         log_d("PhysCallsPS: %d", physicsCalls);
-        log_d("Push time: %dmcs\n", debugPushCheck);
+        log_d("Push time: %dmcs", debugPushCheck);
+        log_d("Vertecies size: %d", Scene::vertecies.size());
+        log_d("Polygons size: %d \n", Scene::polygons.size());
         // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
 
         statusCheckTime = millis();

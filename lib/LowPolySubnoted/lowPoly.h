@@ -11,8 +11,9 @@
 
 //dependencies
 
-#include "selfGFX/entity.h"
 #include "selfGFX/vector.h"
+#include "selfGFX/polygon.h"
+#include "selfGFX/entity.h"
 
 #include "scene/scene.h"
 #include "scene/sceneManager.h"

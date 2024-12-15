@@ -1,7 +1,11 @@
 #include "sceneTest.h"
+#include <displayInfo.h>
+
+uint16_t BG_COL = Scene::tft->color565(104,144,195); //test color
 
 
-uint16_t BG_COL = Scene::tft->color565(194,144,195); //test color
+Vector light = Vector(0,-0.5,1);
+// UnitVector light = UnitVector(0,0,255);
 
 
 
