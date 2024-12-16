@@ -32,7 +32,13 @@ void core0(void * pvParameters);
 ////////////////SETUP/////////////////////////////////
 void setup() 
 {
-    randomSeed(analogRead(23));
+    pinMode(12, ANALOG);
+
+    pinMode(34, INPUT_PULLDOWN); //vertical (3000 - 650)
+    pinMode(4, INPUT_PULLDOWN); //horizontal (3050 - 720)
+    pinMode(32, PULLDOWN);
+    randomSeed(analogRead(12));
+
 	
     log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
     log_d("free heap: %d\n", ESP.getFreeHeap());
@@ -51,7 +57,7 @@ void setup()
 	//tft.fillScreen(BG_COL);
 
 	tft.fillScreen(TFT_RED);
-    delay(300);
+    //delay(300);
     tft.setSwapBytes(false);
     // Entity::initALL(&sprite, SCRN_WIDTH, SCRN_HEIGHT, &FOV, &last_FOV, &BG_COL);
     // Cube.init();
@@ -112,6 +118,7 @@ void loop()
     
     sceneManager.render(); //call of this func = +~2mcs
 
+    //log_d("ADC %d", analogRead(4));
     //Entity::processAllEntities(deltaTime);
 }
 

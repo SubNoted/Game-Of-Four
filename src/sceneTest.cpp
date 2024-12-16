@@ -12,6 +12,7 @@ Vector light = Vector(0,-0.5,1);
 Entity cube;
 float size = 100, x = CENTR_X, y = CENTR_Y;
 float FOV = PI/2;
+float input_x = 0, input_y = 0;
 
 void Tscene::update(uint32_t deltaTime) 
 {
@@ -20,8 +21,11 @@ void Tscene::update(uint32_t deltaTime)
     
     // READY_TO_RENDER = true;
     
-    //cube.rotate(Vector(0.002*deltaTime,0.002*deltaTime,0));
-    cube.setRotation(Vector(0.002*millis(),0,y));
+    input_x = float(map(analogRead(4), 765, 3050, 0, 1000)-500)/1000;
+    input_y = float(map(analogRead(34), 695, 3000, 0, 1000)-500)/1000;
+    if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
+        cube.rotate(Vector(0,-0.01*deltaTime*input_x,-0.01*deltaTime*input_y));
+    // cube.setRotation(Vector(0.002*millis(),0,y));
 }
 
 void Tscene::render() 
