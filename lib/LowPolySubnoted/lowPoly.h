@@ -10,6 +10,7 @@
 #include <string>
 
 //dependencies
+#include <devSetup.h>
 
 #include "selfGFX/vector.h"
 #include "selfGFX/polygon.h"

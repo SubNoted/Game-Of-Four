@@ -1,5 +1,4 @@
 #include "sceneTest.h"
-#include <displayInfo.h>
 
 uint16_t BG_COL = Scene::tft->color565(104,144,195); //test color
 
@@ -24,7 +23,7 @@ void Tscene::update(uint32_t deltaTime)
     input_x = float(map(analogRead(4), 765, 3050, 0, 1000)-500)/1000;
     input_y = float(map(analogRead(34), 695, 3000, 0, 1000)-500)/1000;
     if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
-        cube.rotate(Vector(0,-0.05*deltaTime*input_x,-0.05*deltaTime*input_y));
+        cube.rotate(Vector(0,-0.03*deltaTime*input_x,-0.03*deltaTime*input_y));
     // cube.setRotation(Vector(0.002*millis(),0,y));
 }
 

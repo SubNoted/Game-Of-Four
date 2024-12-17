@@ -8,8 +8,6 @@
 
 #include <lowPoly.h>
 
-#include <displayInfo.h>
-
 
 TFT_eSPI tft = TFT_eSPI();
 TFT_eSprite canvas[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft)};

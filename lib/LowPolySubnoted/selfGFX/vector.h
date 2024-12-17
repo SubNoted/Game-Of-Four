@@ -2,7 +2,7 @@
 #define _VECTOR_
 
 // #include <lowPoly.h>
-#include <displayInfo.h>
+#include <devSetup.h>
 
 class Vector
 {
