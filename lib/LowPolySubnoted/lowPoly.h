@@ -11,6 +11,7 @@
 
 //dependencies
 #include <devSetup.h>
+#include "scene/settings.h"
 
 #include "selfGFX/vector.h"
 #include "selfGFX/polygon.h"

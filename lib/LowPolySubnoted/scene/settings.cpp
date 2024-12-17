@@ -1,4 +1,4 @@
 #include "settings.h"
 
-float Settings::fov = PI*0.5;
-float Settings::renderDistance=100; //todo think about metrics
+float Settings::fov = DEFAULT_FOV;
+float Settings::renderDistance=DEFAULT_RENDER_DISTANCE;

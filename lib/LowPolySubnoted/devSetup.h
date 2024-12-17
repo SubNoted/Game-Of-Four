@@ -13,6 +13,9 @@
 #define SCRN_ROTATION 2 // 0: landscape
 #define SPLIT_SCREEN 2
 
+#define DEFAULT_FOV PI*0.5
+#define DEFAULT_RENDER_DISTANCE 100 //todo think about metrics
+
 /////////////////////saves//////////////////////
 struct saveFile 
 {
