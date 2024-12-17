@@ -27,8 +27,8 @@ void SceneManager::changeScene(std::unique_ptr<Scene> newScene) {
     }
     currentScene = std::move(newScene);
 
-    // Scene::vertecies.reserve(8);
-    // Scene::polygons.reserve(12);
+    Scene::vertecies.reserve(8);
+    Scene::polygons.reserve(12);
 
     currentScene->setSceneManager(this);
     currentScene->enter();

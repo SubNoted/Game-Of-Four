@@ -10,7 +10,7 @@ Vector light = Vector(0,-0.5,1);
 
 Entity cube;
 float size = 100, x = CENTR_X, y = CENTR_Y;
-float FOV = PI/2;
+float FOV = Settings::fov;
 float input_x = 0, input_y = 0;
 
 void Tscene::update(uint32_t deltaTime) 
