@@ -3,6 +3,7 @@
 GraphicsRenderer::GraphicsRenderer(TFT_eSPI* tft, TFT_eSprite* canvas, uint16_t** cnvsPtr)
     : tft(tft), canvas(canvas), cnvsPtr(cnvsPtr) {}
 
+
 void GraphicsRenderer::renderScene(const std::vector<Polygon>& polygons, const std::vector<Vector>& vertices, 
                                    const Vector& light, float FOV, uint16_t BG_COL) {
     for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) {
@@ -37,10 +38,12 @@ void GraphicsRenderer::renderPolygon(const Polygon& polygon, const std::vector<V
         verts[2].x, verts[2].y,
         color
     );
+#if DEBUG_MODE
     canvas[cnvsNum].drawTriangle(
         verts[0].x, verts[0].y,
         verts[1].x, verts[1].y,
         verts[2].x, verts[2].y,
         TFT_DARKGREY
     );
+#endif
 }

@@ -19,6 +19,7 @@
 /////////////////////saves//////////////////////
 struct saveFile 
 {
+    //change as you wish
     char userName[16] = "NOMEMO";
     
     uint8_t difficulty = 0;

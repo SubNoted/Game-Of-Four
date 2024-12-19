@@ -5,6 +5,7 @@
 
 class GraphicsRenderer {
 public:
+
     GraphicsRenderer(TFT_eSPI* tft, TFT_eSprite* canvas, uint16_t** cnvsPtr);
     void renderScene(const std::vector<Polygon>& polygons, const std::vector<Vector>& vertices, 
                      const Vector& light, float FOV, uint16_t BG_COL);
