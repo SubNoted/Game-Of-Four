@@ -1,11 +1,12 @@
 #include "renderer.h"
 
-GraphicsRenderer::GraphicsRenderer(TFT_eSPI* tft, TFT_eSprite* canvas, uint16_t** cnvsPtr)
-    : tft(tft), canvas(canvas), cnvsPtr(cnvsPtr) {}
+// GraphicsRenderer::GraphicsRenderer(TFT_eSPI* tft, TFT_eSprite* canvas, uint16_t** cnvsPtr)
+//     : tft(tft), canvas(canvas), cnvsPtr(cnvsPtr) {}
 
 
-void GraphicsRenderer::renderScene(const std::vector<Polygon>& polygons, const std::vector<Vector>& vertices, 
-                                   const Vector& light, float FOV, uint16_t BG_COL) {
+void BasicRendererStrategy::renderScene(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft,
+                     const std::vector<Polygon>& polygons, const std::vector<Vector>& vertices,
+                     const Vector& light, float FOV, uint16_t BG_COL) {
     for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) {
         canvas[cnvsNum].fillScreen(BG_COL);
         for (const auto& polygon : polygons) {
