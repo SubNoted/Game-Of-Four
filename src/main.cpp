@@ -66,12 +66,12 @@ void setup()
 
     canvas[0].setColorDepth(16); 
     canvas[1].setColorDepth(16); 
-	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCRN_HEIGHT, SCRN_HEIGHT/SPLIT_SCREEN);
-	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCRN_HEIGHT, SCRN_HEIGHT/SPLIT_SCREEN);
+	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN);
+	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN);
 	canvas[0].setSwapBytes(true);
 	canvas[1].setSwapBytes(true);
     
-    canvas[1].setViewport(0, -SCRN_HEIGHT/SPLIT_SCREEN, SCRN_HEIGHT, SCRN_HEIGHT);
+    canvas[1].setViewport(0, -SCRN_HEIGHT/SPLIT_SCREEN, SCRN_WIDTH, SCRN_HEIGHT);
 
     delay(500);
 
@@ -81,6 +81,8 @@ void setup()
     
     
     xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
+
+    tft.startWrite();
 }
 
 void drawFrame()
@@ -115,6 +117,11 @@ void loop()
     //render
     
     sceneManager.render(); //call of this func = +~2mcs
+
+    //canvas[0].fillScreen(TFT_GREEN);
+    //tft.pushImageDMA(200,200, SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN, cnvsPtr[0]);
+
+    //canvas[0].pushSprite(10,10);
 
     //log_d("ADC %d", analogRead(4));
     //Entity::processAllEntities(deltaTime);
