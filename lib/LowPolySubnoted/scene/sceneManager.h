@@ -7,7 +7,7 @@
 
 class SceneManager {
 public:
-    void init(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft);
+    static void init(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft);
     void changeScene(std::unique_ptr<Scene> newScene);
     void update();
     void render();
@@ -31,7 +31,7 @@ private:
 #endif // DEBUG_MODE
     
 
-    std::unique_ptr<Scene> currentScene;
+    std::unique_ptr<Scene> currentScene = nullptr;
 };
 
 #endif // SCENE_MANAGER_H

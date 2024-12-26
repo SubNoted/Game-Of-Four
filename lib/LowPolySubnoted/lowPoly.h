@@ -22,6 +22,17 @@
 
 
 
+class LowPoly
+{
+public:
+    TFT_eSPI tft = TFT_eSPI();
+    TFT_eSprite canvas[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft)};
+    uint16_t* cnvsPtr[2];
+    
+    void init();
+
+    void loop();
+};
 
 
 

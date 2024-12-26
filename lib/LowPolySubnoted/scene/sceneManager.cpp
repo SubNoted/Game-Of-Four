@@ -12,9 +12,6 @@ void SceneManager::init(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft)
     Scene::canvas = canvas;
     Scene::cnvsPtr = cnvsPtr;
     Scene::tft = tft;
-    currentScene = nullptr;
-
-    last4deltaTime = millis();
 }
 
 std::vector<Vector> Scene::vertecies = std::vector<Vector>();
@@ -24,6 +21,8 @@ void SceneManager::changeScene(std::unique_ptr<Scene> newScene) {
     if (currentScene) {
         Scene::vertecies.clear();
         currentScene->exit();
+
+        last4deltaTime = millis();
     }
     currentScene = std::move(newScene);
 
