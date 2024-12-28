@@ -23,5 +23,7 @@ void GraphicsRenderer::init()
 
 void GraphicsRenderer::renderScene(std::shared_ptr<Scene> scene)
 {
+    // if (tft.dmaBusy())
+    //     return;
     strategy->renderScene(scene, tft, canvas, cnvsPtr);    
 }

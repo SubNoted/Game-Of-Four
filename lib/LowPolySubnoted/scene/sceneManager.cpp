@@ -36,7 +36,7 @@ void SceneManager::update() {
 
 void SceneManager::render() {
 #if DEBUG_MODE
-    debugTimeStart = micros();
+    Debug::debugPushCheck = micros();
 #endif 
 
 
@@ -48,7 +48,7 @@ void SceneManager::render() {
 
 
 #if DEBUG_MODE    
-    debugPushCheck = micros() - debugTimeStart;
+    Debug::debugPushCheck = micros() - Debug::debugPushCheck;
 
     frameCalls++;
     if (millis() - statusCheckTime > 1000)
@@ -56,7 +56,8 @@ void SceneManager::render() {
         //log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
         log_d("FPS: %d", frameCalls);
         log_d("PhysCallsPS: %d", physicsCalls);
-        log_d("Push time: %dmcs", debugPushCheck);
+        log_d("Push time: %dmcs", Debug::debugPushCheck);
+        log_d("Render time: %dmcs", Debug::debugRenderCheck);
         log_d("Vertecies size: %d", currentScene->vertices.size());
         log_d("Polygons size: %d \n", currentScene->polygons.size());
         // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
@@ -64,6 +65,7 @@ void SceneManager::render() {
         statusCheckTime = millis();
         frameCalls = 0;
         physicsCalls = 0;
+        Debug::debugRenderCheck = 0;
     }
 #endif 
 }

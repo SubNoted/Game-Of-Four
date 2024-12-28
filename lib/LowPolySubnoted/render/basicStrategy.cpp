@@ -4,6 +4,7 @@ void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& 
 {
     for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {
+        Debug::debugRenderCheck = micros();
         canvas[cnvsNum].fillScreen(TFT_CYAN);
         for (uint8_t i = 0; i < scene->polygons.size(); i++) 
         {
@@ -38,6 +39,8 @@ void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& 
 #endif
 
         }
+
+        Debug::debugRenderCheck = micros() - Debug::debugRenderCheck;
         tft.pushImageDMA(0, SCRN_HEIGHT/SPLIT_SCREEN*cnvsNum, SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN, cnvsPtr[cnvsNum]);
     }
 

@@ -8,6 +8,8 @@
 #include <render/renderer.h>
 #include <render/basicStrategy.h>
 
+#include "debug.h"
+
 class SceneManager {
 public:
 
@@ -36,10 +38,8 @@ private:
 #if DEBUG_MODE
     uint8_t frameCalls = 0, physicsCalls = 0;
 
-    unsigned long statusCheckTime = 0, clearTime = 0;
+    unsigned long statusCheckTime = 0;
 
-    unsigned long debugTimeStart = 0, debugPushCheck = 0, debugRenderCheck = 0; 
-    unsigned long frameTimeStart = 0;
 #endif // DEBUG_MODE
 
 

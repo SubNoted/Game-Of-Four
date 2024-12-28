@@ -2,7 +2,7 @@
 #define BASIC_RENDER_STRATEGY
 
 #include "renderer.h"
-
+#include "debug.h"
 
 class BasicRendererStrategy : public IRendererStrategy {
 public:
