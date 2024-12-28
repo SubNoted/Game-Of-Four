@@ -27,7 +27,8 @@ void setup()
     randomSeed(analogRead(12));
 
 	lowPoly.init();
-    sceneManager.changeScene(std::unique_ptr<Tscene>(new Tscene()));//set test scene
+    sceneManager.initRenderer();
+    sceneManager.changeScene(std::shared_ptr<Tscene>(new Tscene()));//set test scene
     
     xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
 

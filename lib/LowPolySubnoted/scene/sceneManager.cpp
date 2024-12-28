@@ -1,33 +1,19 @@
 #include "SceneManager.h"
 
 
-// Define the static member variables
-TFT_eSprite* Scene::canvas = nullptr;
-uint16_t** Scene::cnvsPtr = nullptr;
-TFT_eSPI* Scene::tft = nullptr;
 
-
-void SceneManager::init(TFT_eSprite* canvas, uint16_t** cnvsPtr, TFT_eSPI* tft)
-{
-    Scene::canvas = canvas;
-    Scene::cnvsPtr = cnvsPtr;
-    Scene::tft = tft;
-}
-
-std::vector<Vector> Scene::vertecies = std::vector<Vector>();
-std::vector<Polygon> Scene::polygons = std::vector<Polygon>();
-
-void SceneManager::changeScene(std::unique_ptr<Scene> newScene) {
+void SceneManager::changeScene(std::shared_ptr<Scene> newScene) {
     if (currentScene) {
-        Scene::vertecies.clear();
+        currentScene->vertices.clear();
+        currentScene->polygons.clear();
         currentScene->exit();
 
         last4deltaTime = millis();
     }
     currentScene = std::move(newScene);
 
-    Scene::vertecies.reserve(8);
-    Scene::polygons.reserve(12);
+    currentScene->vertices.reserve(8);
+    currentScene->polygons.reserve(12);
 
     currentScene->setSceneManager(this);
     currentScene->enter();
@@ -56,8 +42,10 @@ void SceneManager::render() {
 
     //render
     if (currentScene) {
-        currentScene->render();
+        renderer.renderScene(currentScene);
     }
+
+
 
 #if DEBUG_MODE    
     debugPushCheck = micros() - debugTimeStart;
@@ -69,8 +57,8 @@ void SceneManager::render() {
         log_d("FPS: %d", frameCalls);
         log_d("PhysCallsPS: %d", physicsCalls);
         log_d("Push time: %dmcs", debugPushCheck);
-        log_d("Vertecies size: %d", Scene::vertecies.size());
-        log_d("Polygons size: %d \n", Scene::polygons.size());
+        log_d("Vertecies size: %d", currentScene->vertices.size());
+        log_d("Polygons size: %d \n", currentScene->polygons.size());
         // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
 
         statusCheckTime = millis();

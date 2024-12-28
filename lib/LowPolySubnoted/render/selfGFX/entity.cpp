@@ -22,8 +22,6 @@ uint8_t Entity::ENTITIES_COUNT = 0;
 
 // uint8_t Entity::datum = TC_DATUM;
 
-Entity::Entity(){};
-
 //static
 // void Entity::initALL(TFT_eSprite *s, uint16_t screen_width, uint16_t screen_height, float *fov, float *last_fov, uint16_t *bg_col)
 // {
@@ -215,8 +213,27 @@ void Entity::processPhysics(float &t)
 //     return false;
 // }
 
+Entity::Entity()
+{
+    this->vertices = nullptr;
+    this->polygons = nullptr;
+}
 
-void Entity::initCube(Vector o, Vector size)
+Entity::Entity(std::vector<Polygon>* polygons, std::vector<Vector>* vertices)
+{
+    this->vertices = vertices;
+    this->polygons = polygons;
+}
+
+
+void Entity::init(std::vector<Polygon>* polygons, std::vector<Vector>* vertices)
+{
+    this->vertices = vertices;
+    this->polygons = polygons;
+}
+
+
+void Entity::createCube(Vector o, Vector size)
 {
     //todo deinit if exists
     this->O.Equals(o);
@@ -232,47 +249,47 @@ void Entity::initCube(Vector o, Vector size)
 //   |          | /          
 //   3----------2     
 
-    verStartNum = Scene::vertecies.size();
+    verStartNum = vertices->size();
     verSize = 8;
 
-    Scene::vertecies.push_back(Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
-    Scene::vertecies.push_back(Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
-    Scene::vertecies.push_back(Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
-    Scene::vertecies.push_back(Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
+    vertices->push_back(Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
+    vertices->push_back(Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
+    vertices->push_back(Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
+    vertices->push_back(Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
 
-    Scene::vertecies.push_back(Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
-    Scene::vertecies.push_back(Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
-    Scene::vertecies.push_back(Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
-    Scene::vertecies.push_back(Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
+    vertices->push_back(Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
+    vertices->push_back(Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
+    vertices->push_back(Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
+    vertices->push_back(Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
 
     //0-1-2-3
-    Scene::polygons.push_back(Polygon(verStartNum, verStartNum + 1, verStartNum + 2));
-    Scene::polygons.push_back(Polygon(verStartNum, verStartNum + 2, verStartNum + 3));
+    polygons->push_back(Polygon(verStartNum, verStartNum + 1, verStartNum + 2));
+    polygons->push_back(Polygon(verStartNum, verStartNum + 2, verStartNum + 3));
 
     for (int i = 0; i < 4; i++)
     {
-        Scene::polygons.push_back(Polygon(verStartNum + i, verStartNum + 4 + (i + 1) % 4, verStartNum + (i+1)%4));
-        Scene::polygons.push_back(Polygon(verStartNum + i, verStartNum + 4 + i, verStartNum + 4 + (i + 1) % 4));
+        polygons->push_back(Polygon(verStartNum + i, verStartNum + 4 + (i + 1) % 4, verStartNum + (i+1)%4));
+        polygons->push_back(Polygon(verStartNum + i, verStartNum + 4 + i, verStartNum + 4 + (i + 1) % 4));
     }
 
     //4-5-6-7
-    Scene::polygons.push_back(Polygon(verStartNum+4, verStartNum + 6, verStartNum + 5));
-    Scene::polygons.push_back(Polygon(verStartNum+4, verStartNum + 7, verStartNum + 6));
+    polygons->push_back(Polygon(verStartNum+4, verStartNum + 6, verStartNum + 5));
+    polygons->push_back(Polygon(verStartNum+4, verStartNum + 7, verStartNum + 6));
 
 }
 
 
 void Entity::setCube()
 {
-    Scene::vertecies[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
-    Scene::vertecies[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
-    Scene::vertecies[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
-    Scene::vertecies[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
+    (*vertices)[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
+    (*vertices)[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
+    (*vertices)[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
+    (*vertices)[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
 
-    Scene::vertecies[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
-    Scene::vertecies[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
-    Scene::vertecies[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
-    Scene::vertecies[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
+    (*vertices)[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
+    (*vertices)[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
+    (*vertices)[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
+    (*vertices)[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
 
 }
 
@@ -300,15 +317,15 @@ Vector Entity::getSize()
 }
 void Entity::setRotation(Vector v)
 {    
-    Scene::vertecies[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
-    Scene::vertecies[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
-    Scene::vertecies[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
-    Scene::vertecies[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
+    (*vertices)[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
+    (*vertices)[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
+    (*vertices)[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
+    (*vertices)[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
 
-    Scene::vertecies[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
-    Scene::vertecies[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
-    Scene::vertecies[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
-    Scene::vertecies[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
+    (*vertices)[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
+    (*vertices)[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
+    (*vertices)[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
+    (*vertices)[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
 }
 void Entity::rotate(Vector v)
 {
@@ -319,7 +336,7 @@ void Entity::rotate(Vector v)
 
     for (int i = verStartNum; i < verSize; i++)
     {
-        Scene::vertecies[i].Rotate(v, O);
+        (*vertices)[i].Rotate(v, O);
     }
 }
 Vector Entity::getAngle()
@@ -435,22 +452,6 @@ uint16_t Entity::getColor()
 //     last_textWrap = textWrap;
 //     this->Update = false;
 // }
-
-//private
-void Entity::toFOV_XY(Vector* v, const float& fov, const Vector& offSet)
-{
-    v->Plus(offSet);
-    v->Equals(CENTR_X  + (v->x - CENTR_X)/(v->z*tan(fov/2)/SCREEN_WIDTH+1), 
-            CENTR_Y + (v->y - CENTR_Y)/(v->z*tan(fov/2)/SCREEN_WIDTH+1));
-    v->Minus(offSet);
-}
-void Entity::toFOV_XY(Vector* v, const float& fov, const Vector& actOffSet, const Vector& refOffSet)
-{
-    v->Plus(actOffSet);
-    v->Equals(CENTR_X  + (v->x - CENTR_X)/(v->z*tan(fov/2)/SCREEN_WIDTH+1), 
-            CENTR_Y + (v->y - CENTR_Y)/(v->z*tan(fov/2)/SCREEN_WIDTH+1));
-    v->Minus(refOffSet);
-}
 
 // void Entity::drawCubeFaces(Vector* p, const uint32_t c, bool light)
 // {

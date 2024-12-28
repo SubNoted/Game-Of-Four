@@ -1,13 +1,27 @@
 #ifndef _ENTITY_
 #define _ENTITY_
 
-#include <lowPoly.h>
+// #include <lowPoly.h>
+
+// #include "vector.h"
+#include "polygon.h"
+// #include <devSetup.h>
+// #include "vector2.h"
+// #include "matrix3.h"
+// #include "color.h"
+// #include "texture.h"
+// #include "material.h"
 #include <vector>
 
+// #include "scene/scene.h"
 
 class Entity
 {
 private:
+
+    // Scene *scene;
+    std::vector<Polygon>* polygons = nullptr;
+    std::vector<Vector>* vertices = nullptr;
 
 
     // static Vector2 Camera;
@@ -35,8 +49,6 @@ private:
     bool isToUpdate();
     
     void createSprite(uint16_t x, uint16_t y);
-    void toFOV_XY(Vector* v, const float& fov, const Vector& actOffSet, const Vector& refOffSet);
-    void toFOV_XY(Vector* v, const float& fov, const Vector& offSet);
     void drawCubeFaces(Vector* p, uint32_t c, bool light);
     void print(String s, Vector2 pos, float siz, uint32_t c);
 
@@ -69,7 +81,12 @@ public:
     Vector constA;
     Vector lightDirection;
 
-    Entity createCube(Vector o, Vector size);
+    Entity();
+    Entity(std::vector<Polygon>* polygons, std::vector<Vector>* vertices);
+    void init(std::vector<Polygon>* polygons, std::vector<Vector>* vertices);
+    void reInit(std::vector<Polygon>* polygons, std::vector<Vector>* vertices);
+
+    void createCube(Vector o, Vector size);
 
     //set
     void setPosition(Vector v);
@@ -115,10 +132,6 @@ public:
     static void deleteALL();
     void processPhysics(float &t);
 
-    Entity(void);
-    void initCube(Vector o, Vector size);
-    void init();
-    void reInit();
     void deleteEntity();
 
     void drawCube();

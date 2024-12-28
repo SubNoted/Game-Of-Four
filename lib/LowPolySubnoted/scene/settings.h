@@ -1,7 +1,8 @@
 #ifndef _SETTINGS_
 #define _SETTINGS_
 
-#include <lowPoly.h>
+// #include <lowPoly.h>
+#include <devSetup.h>
 
 class Settings {
 
