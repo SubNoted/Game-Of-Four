@@ -1,23 +1,24 @@
 #ifndef _LOWPOLY_
 #define _LOWPOLY_
 
-#define DEBUG_MODE true
 #define LOW_POLY_VERSION "0.0.1"
 
 //Standard support
 #include <Arduino.h>
-#include <TFT_eSPI.h> 
+// #include <TFT_eSPI.h> 
 #include <string>
 
 //dependencies
-#include <devSetup.h>
-#include "scene/settings.h"
+// #include "scene/settings.h"
+// #include <devSetup.h>
 
-#include "selfGFX/vector.h"
-#include "selfGFX/polygon.h"
-#include "selfGFX/entity.h"
+// #include "selfGFX/vector.h"
+// #include "selfGFX/polygon.h"
+// #include "selfGFX/entity.h"
 
-#include "scene/scene.h"
+// #include "selfGFX/renderer.h"
+
+// #include "scene/scene.h"
 #include "scene/sceneManager.h"
 
 
@@ -25,15 +26,9 @@
 class LowPoly
 {
 public:
-    TFT_eSPI tft = TFT_eSPI();
-    TFT_eSprite canvas[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft)};
-    uint16_t* cnvsPtr[2];
-    
+
     void init();
-
-    void loop();
 };
-
 
 
 

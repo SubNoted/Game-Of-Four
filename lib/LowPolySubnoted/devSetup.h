@@ -3,6 +3,8 @@
 
 #include <Arduino.h>
 
+#define DEBUG_MODE true
+
 //////////////////display info/////////////////
 #define SCRN_WIDTH 240
 #define SCRN_HEIGHT 280
