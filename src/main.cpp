@@ -21,12 +21,10 @@ void setup()
 {
     pinMode(12, ANALOG);
 
-    pinMode(34, INPUT_PULLDOWN); //vertical (3000 - 650)
-    pinMode(4, INPUT_PULLDOWN); //horizontal (3050 - 720)
+    pinMode(34, INPUT_PULLDOWN);
+    pinMode(4, INPUT_PULLDOWN);
     pinMode(32, PULLDOWN);
     randomSeed(analogRead(12));
-
-    ////////////init////////////////////
 
 	lowPoly.init();
     sceneManager.changeScene(std::unique_ptr<Tscene>(new Tscene()));//set test scene
