@@ -11,6 +11,8 @@
 // User defined information reported by "Read_User_Setup" test & diagnostics example
 #define USER_SETUP_INFO "User_Setup"
 
+#include "devSetup.h"
+
 // Define to disable all #warnings in library (can be put in User_Setup_Select.h)
 //#define DISABLE_ALL_LIBRARY_WARNINGS
 
@@ -87,10 +89,10 @@
 // #define TFT_WIDTH  128
 // #define TFT_WIDTH  172 // ST7789 172 x 320
 // #define TFT_WIDTH  170 // ST7789 170 x 320
- #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
+ #define TFT_WIDTH SCRN_WIDTH // ST7789 240 x 240 and 240 x 320
 // #define TFT_HEIGHT 160
 // #define TFT_HEIGHT 128
- #define TFT_HEIGHT 280 // ST7789 240 x 240
+ #define TFT_HEIGHT SCRN_HEIGHT // ST7789 240 x 240
 // #define TFT_HEIGHT 320 // ST7789 240 x 320
 // #define TFT_HEIGHT 240 // GC9A01 240 x 240
 
@@ -213,27 +215,24 @@
 // For ESP32 Dev board (only tested with ILI9341 display)
 // The hardware SPI can be mapped to any pins
 
-//#define TFT_MISO 19
-//#define TFT_MOSI 23
-//#define TFT_SCLK 18
-//#define TFT_CS   15  // Chip select control pin
-//#define TFT_DC    2  // Data Command control pin
-//#define TFT_RST   4  // Reset pin (could connect to RST pin)
-//#define TFT_RST  -1  // Set TFT_RST to -1 if display RESET is connected to ESP32 board RST
-
-// For ESP32 Dev board (only tested with GC9A01 display)
-// The hardware SPI can be mapped to any pins
-
-
-
-// #define TFT_MOSI 13 // In some display driver board, it might be written as "SDA" and so on.
-// #define TFT_SCLK 14
+// #define TFT_MISO 19
+// #define TFT_MOSI 23
+// #define TFT_SCLK 18
 // #define TFT_CS   15  // Chip select control pin
-// #define TFT_DC   27  // Data Command control pin
-// #define TFT_RST  26//33  // Reset pin (could connect to Arduino RESET pin)
-// //#define TFT_BL   22  // LED back-light
+// #define TFT_DC    2  // Data Command control pin
+// #define TFT_RST   4  // Reset pin (could connect to RST pin)
 
 
+#ifdef ESP32_ON
+// //////////////// For ESP32 Dev board//////////////
+
+#define TFT_MOSI 13 // In some display driver board, it might be written as "SDA" and so on.
+#define TFT_SCLK 14
+#define TFT_CS   15  // Chip select control pin
+#define TFT_DC   27  // Data Command control pin
+#define TFT_RST  26//33  // Reset pin (could connect to Arduino RESET pin)
+
+#elif defined(ESP32_S3_ON)
 //////////////// For ESP32-S3 Dev board//////////////
 
 #define TFT_MOSI 11//15 // In some display driver board, it might be written as "SDA" and so on.
@@ -241,7 +240,7 @@
 #define TFT_CS   10  // Chip select control pin
 #define TFT_DC   9  // Data Command control pin
 #define TFT_RST  3//33  // Reset pin (could connect to Arduino RESET pin)
-
+#endif
 
 
 //#define TOUCH_CS 21     // Chip select pin (T_CS) of touch screen

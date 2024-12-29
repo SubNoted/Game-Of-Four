@@ -9,13 +9,17 @@ void GraphicsRenderer::init()
 	tft.fillScreen(TFT_RED);
     tft.setSwapBytes(false);
 
-    canvas[0].setColorDepth(16); 
-    canvas[1].setColorDepth(16); 
-	cnvsPtr[0] = (uint16_t*)canvas[0].createSprite(SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN);
-	cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN);
-	canvas[0].setSwapBytes(true);
-	canvas[1].setSwapBytes(true);
-    canvas[1].setViewport(0, -SCRN_HEIGHT/SPLIT_SCREEN, SCRN_WIDTH, SCRN_HEIGHT);
+    // canvas[1].setColorDepth(16);
+	// cnvsPtr[1] = (uint16_t*)canvas[1].createSprite(SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN);
+	// canvas[1].setSwapBytes(true);
+
+    for (int8_t i = 0; i < SPLIT_SCREEN; i++)
+    {
+        canvas[i].setColorDepth(16);
+        cnvsPtr[i] = (uint16_t*)canvas[i].createSprite(SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN);
+        canvas[i].setSwapBytes(true);
+        canvas[i].setViewport(0, -SCRN_HEIGHT/SPLIT_SCREEN*i, SCRN_WIDTH, SCRN_HEIGHT);
+    }
     
     tft.startWrite();
     

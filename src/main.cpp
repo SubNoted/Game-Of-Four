@@ -21,9 +21,20 @@ void setup()
 {
     pinMode(12, ANALOG);
 
-    // pinMode(34, INPUT_PULLDOWN);
-    pinMode(4, INPUT_PULLDOWN);
-    // pinMode(32, PULLDOWN);
+    ////esp32////
+#ifdef ESP32_ON
+    pinMode(34, INPUT_PULLDOWN); //left stick Y axis
+    pinMode(4, INPUT_PULLDOWN); //left stick X axis
+#elif defined(ESP32_S3_ON)
+    //esp32-s3////
+    pinMode(14, INPUT_PULLDOWN); //left stick Y axis
+    pinMode(13, INPUT_PULLDOWN); //left stick X axis
+
+    pinMode(4, INPUT_PULLDOWN); //right stick Y axis
+    pinMode(5, INPUT_PULLDOWN); //right stick X axis
+#endif
+
+
     randomSeed(analogRead(12));
 
 	lowPoly.init();

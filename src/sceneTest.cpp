@@ -21,10 +21,16 @@ void Tscene::update(uint32_t deltaTime)
     
     // // READY_TO_RENDER = true;
     
-    // input_x = float(map(analogRead(4), 765, 3050, 0, 1000)-500)/1000;
-    // input_y = float(map(analogRead(34), 695, 3000, 0, 1000)-500)/1000;
-    // if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
-    //     cube.rotate(Vector(0,-0.03*deltaTime*input_x,-0.03*deltaTime*input_y));
+#ifdef ESP32_ON
+    input_x = (float)(map(analogRead(34), 765, 3050, 0, 1000)-500)/1000;
+    input_y = (float)(map(analogRead(4), 695, 3000, 0, 1000)-500)/1000;
+#elif defined(ESP32_S3_ON)
+    input_x = (float)(map(analogRead(5), 765, 3050, 0, 1000)-500)/1000;
+    input_y = (float)(map(analogRead(4), 695, 3000, 0, 1000)-500)/1000;
+#endif
+
+    if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
+        cube.rotate(Vector(0,-0.01*deltaTime*input_x,-0.01*deltaTime*input_y));
     // cube.setRotation(Vector(0.002*millis(),0,y));
 }
 

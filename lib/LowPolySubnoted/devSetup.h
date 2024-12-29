@@ -5,6 +5,11 @@
 
 #define DEBUG_MODE true
 
+//////////////////microcontroller/////////////////
+
+#define ESP32_ON
+// #define ESP32_S3_ON
+
 //////////////////display info/////////////////
 #define SCRN_WIDTH 240
 #define SCRN_HEIGHT 280
