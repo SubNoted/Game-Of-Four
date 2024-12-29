@@ -3,14 +3,13 @@
 void LowPoly::init()
 {
 #if DEBUG_MODE
-    log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
-    log_d("free heap: %d\n", ESP.getFreeHeap());
-
-    
-    if(psramFound())
-    {
-        log_d("PSRAM Detected\n");
-    }
+    log_d("Memory info (before initialization)\nPSRAM - \tTotal: %u,\tFree: %u,\tBiggest free block: %u\nInternal  - \tTotal: %u,\tFree: %u,\tBiggest free block: %u\n", 
+        heap_caps_get_total_size(MALLOC_CAP_SPIRAM),
+        heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
+        heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM),
+        heap_caps_get_total_size(MALLOC_CAP_INTERNAL),
+        heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+        heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
 
 #endif
 }

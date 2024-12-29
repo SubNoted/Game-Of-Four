@@ -21,7 +21,7 @@ void SceneManager::changeScene(std::shared_ptr<Scene> newScene) {
 
 void SceneManager::update() {
 #if DEBUG_MODE
-    physicsCalls++;
+    Debug::physicsCalls++;
 #endif
 
     deltaTime = millis() - last4deltaTime;
@@ -50,21 +50,27 @@ void SceneManager::render() {
 #if DEBUG_MODE    
     Debug::debugPushCheck = micros() - Debug::debugPushCheck;
 
-    frameCalls++;
     if (millis() - statusCheckTime > 1000)
     {        
         //log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
-        log_d("FPS: %d", frameCalls);
-        log_d("PhysCallsPS: %d", physicsCalls);
+        log_d("FPS: %d", Debug::frameCalls);
+        log_d("PhysCallsPS: %d", Debug::physicsCalls);
         log_d("Push time: %dmcs", Debug::debugPushCheck);
         log_d("Render time: %dmcs", Debug::debugRenderCheck);
         log_d("Vertecies size: %d", currentScene->vertices.size());
         log_d("Polygons size: %d \n", currentScene->polygons.size());
-        // log_d("heap_caps_get_largest_free_block(MALLOC_CAP_8BIT): %d\n", heap_caps_get_largest_free_block(MALLOC_CAP_8BIT));
+        
+        log_d("Memory info\n\tPSRAM - \tTotal: %u,\tFree: %u,\tBiggest free block: %u\n\tInternal - \tTotal: %u,\tFree: %u,\tBiggest free block: %u\n\n\n", 
+            heap_caps_get_total_size(MALLOC_CAP_SPIRAM),
+            heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
+            heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM),
+            heap_caps_get_total_size(MALLOC_CAP_INTERNAL),
+            heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
+            heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
 
         statusCheckTime = millis();
-        frameCalls = 0;
-        physicsCalls = 0;
+        Debug::frameCalls = 0;
+        Debug::physicsCalls = 0;
         Debug::debugRenderCheck = 0;
     }
 #endif 

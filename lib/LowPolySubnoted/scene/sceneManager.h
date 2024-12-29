@@ -36,7 +36,6 @@ private:
 
 
 #if DEBUG_MODE
-    uint8_t frameCalls = 0, physicsCalls = 0;
 
     unsigned long statusCheckTime = 0;
 
