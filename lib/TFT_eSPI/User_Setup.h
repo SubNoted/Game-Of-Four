@@ -237,7 +237,7 @@
 //////////////// For ESP32-S3 Dev board//////////////
 
 #define TFT_MOSI 11//15 // In some display driver board, it might be written as "SDA" and so on.
-#define TFT_SCLK 13
+#define TFT_SCLK 12
 #define TFT_CS   10  // Chip select control pin
 #define TFT_DC   9  // Data Command control pin
 #define TFT_RST  3//33  // Reset pin (could connect to Arduino RESET pin)
