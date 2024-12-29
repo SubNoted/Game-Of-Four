@@ -21,9 +21,9 @@ void setup()
 {
     pinMode(12, ANALOG);
 
-    pinMode(34, INPUT_PULLDOWN);
+    // pinMode(34, INPUT_PULLDOWN);
     pinMode(4, INPUT_PULLDOWN);
-    pinMode(32, PULLDOWN);
+    // pinMode(32, PULLDOWN);
     randomSeed(analogRead(12));
 
 	lowPoly.init();
@@ -43,6 +43,7 @@ void core0(void * pvParameters){
     esp_task_wdt_add(nullptr);
     for (;;) {
         esp_task_wdt_reset();
+
 
         sceneManager.update(); //current scene update loop
     }
