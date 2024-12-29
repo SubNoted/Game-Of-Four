@@ -1,4 +1,5 @@
 #include "renderer.h"
+#include "debug.h"
 
 void GraphicsRenderer::init()
 {
@@ -27,7 +28,9 @@ void GraphicsRenderer::init()
 
 void GraphicsRenderer::renderScene(std::shared_ptr<Scene> scene)
 {
-    // if (tft.dmaBusy())
-    //     return;
-    strategy->renderScene(scene, tft, canvas, cnvsPtr);    
+    if (tft.dmaBusy())
+        return;
+    
+    Debug::frameCalls++;
+    strategy->renderScene(scene, tft, canvas, cnvsPtr);
 }
