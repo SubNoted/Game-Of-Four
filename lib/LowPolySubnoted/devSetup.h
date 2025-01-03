@@ -18,7 +18,7 @@
 #define CENTR_Y SCRN_HEIGHT / 2
 
 #define SCRN_ROTATION 0 // 0: landscape
-#define SPLIT_SCREEN 2
+#define SPLIT_SCREEN 3 //up tp 5 //todo fix
 
 #define DEFAULT_FOV PI*0.5
 #define DEFAULT_RENDER_DISTANCE 100 //todo think about metrics

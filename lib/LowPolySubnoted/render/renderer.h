@@ -34,10 +34,8 @@ public:
 private:
 
     TFT_eSPI tft = TFT_eSPI();
-    TFT_eSprite canvas[2] = {TFT_eSprite(&tft), TFT_eSprite(&tft)}; //todo fix to split_scrn
+    TFT_eSprite canvas[5] = {TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft), TFT_eSprite(&tft)}; //todo fix to split_scrn
     uint16_t* cnvsPtr[SPLIT_SCREEN];
-
-
 };
 
 #endif // GRAPHICS_RENDERER_H
