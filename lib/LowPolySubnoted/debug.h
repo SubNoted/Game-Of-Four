@@ -7,10 +7,12 @@
 // #if DEBUG_MODE
 class Debug{
 public:
-    static uint8_t frameCalls;
-    static uint8_t physicsCalls;
+    static uint16_t frameCalls;
+    static uint16_t physicsCalls;
     static unsigned long debugPushCheck;
     static unsigned long debugRenderCheck;
+    static unsigned long debugRenderCheckSum;
+    static unsigned long debugRenderCheckCount;
 };
 
 

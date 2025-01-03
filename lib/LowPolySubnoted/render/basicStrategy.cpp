@@ -40,7 +40,8 @@ void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& 
 
         }
 
-        Debug::debugRenderCheck = micros() - Debug::debugRenderCheck;
+        Debug::debugRenderCheckSum += micros() - Debug::debugRenderCheck;
+        Debug::debugRenderCheckCount++;
         tft.pushImageDMA(0, SCRN_HEIGHT/SPLIT_SCREEN*cnvsNum, SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN, cnvsPtr[cnvsNum]);
     }
 

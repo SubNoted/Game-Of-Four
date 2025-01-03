@@ -56,7 +56,7 @@ void SceneManager::render() {
         log_d("FPS: %d", Debug::frameCalls);
         log_d("PhysCallsPS: %d", Debug::physicsCalls);
         log_d("Push time: %dmcs", Debug::debugPushCheck);
-        log_d("Render time: %dmcs", Debug::debugRenderCheck);
+        log_d("Render time: %dmcs", Debug::debugRenderCheckSum/Debug::debugRenderCheckCount);
         log_d("Vertecies size: %d", currentScene->vertices.size());
         log_d("Polygons size: %d \n", currentScene->polygons.size());
         
@@ -71,7 +71,8 @@ void SceneManager::render() {
         statusCheckTime = millis();
         Debug::frameCalls = 0;
         Debug::physicsCalls = 0;
-        Debug::debugRenderCheck = 0;
+        Debug::debugRenderCheckSum = 0;
+        Debug::debugRenderCheckCount = 0;
     }
-#endif 
+#endif
 }
