@@ -60,11 +60,13 @@ void SceneManager::render() {
         log_d("Vertecies size: %d", currentScene->vertices.size());
         log_d("Polygons size: %d \n", currentScene->polygons.size());
         
-        log_d("Memory info\n\tPSRAM - \tTotal: %u,\tFree: %u,\tBiggest free block: %u\n\tInternal - \tTotal: %u,\tFree: %u,\tBiggest free block: %u\n\n\n", 
+        log_d("Memory info\n\tPSRAM - \tTotal: %u,\tUsed: %u,\tFree: %u,\tBiggest free block: %u\n\tInternal - \tTotal: %u,\tUsed: %u,\tFree: %u,\tBiggest free block: %u\n\n\n", 
             heap_caps_get_total_size(MALLOC_CAP_SPIRAM),
+            heap_caps_get_total_size(MALLOC_CAP_SPIRAM)-heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
             heap_caps_get_free_size(MALLOC_CAP_SPIRAM),
             heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM),
             heap_caps_get_total_size(MALLOC_CAP_INTERNAL),
+            heap_caps_get_total_size(MALLOC_CAP_INTERNAL)-heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
             heap_caps_get_free_size(MALLOC_CAP_INTERNAL),
             heap_caps_get_largest_free_block(MALLOC_CAP_INTERNAL));
 
