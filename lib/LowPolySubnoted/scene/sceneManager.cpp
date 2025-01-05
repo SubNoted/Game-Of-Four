@@ -48,15 +48,17 @@ void SceneManager::render() {
 
 
 #if DEBUG_MODE    
-    Debug::debugPushCheck = micros() - Debug::debugPushCheck;
+    Debug::debugPushCheckSum += micros() - Debug::debugPushCheck;
 
     if (millis() - statusCheckTime > 1000)
     {        
         //log_d("Free heap: %d/%d %d%", ESP.getFreeHeap(), ESP.getHeapSize(), 100*ESP.getFreeHeap()/ESP.getHeapSize());
         log_d("FPS: %d", Debug::frameCalls);
         log_d("PhysCallsPS: %d", Debug::physicsCalls);
-        log_d("Push time: %dmcs", Debug::debugPushCheck);
-        log_d("Render time: %dmcs", Debug::debugRenderCheckSum/Debug::debugRenderCheckCount);
+        log_d("Push time: %lumcs", Debug::debugPushCheckSum/Debug::frameCalls);
+        // log_d("Render time: %dmcs", Debug::debugRenderCheckSum/Debug::debugRenderCheckCount);
+        log_d("Render time: %dmcs", Debug::debugRenderCheckSum/Debug::frameCalls);
+        // log_d("Render calls: %d", Debug::debugRenderCheckCount);
         log_d("Vertecies size: %d", currentScene->vertices.size());
         log_d("Polygons size: %d \n", currentScene->polygons.size());
         
@@ -73,6 +75,7 @@ void SceneManager::render() {
         statusCheckTime = millis();
         Debug::frameCalls = 0;
         Debug::physicsCalls = 0;
+        Debug::debugPushCheckSum = 0;
         Debug::debugRenderCheckSum = 0;
         Debug::debugRenderCheckCount = 0;
     }

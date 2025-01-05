@@ -10,6 +10,7 @@ public:
     static uint16_t frameCalls;
     static uint16_t physicsCalls;
     static unsigned long debugPushCheck;
+    static unsigned long debugPushCheckSum;
     static unsigned long debugRenderCheck;
     static unsigned long debugRenderCheckSum;
     static unsigned long debugRenderCheckCount;
