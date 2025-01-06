@@ -2,8 +2,13 @@
 
 uint16_t Debug::frameCalls = 0;
 uint16_t Debug::physicsCalls = 0;
-unsigned long Debug::debugPushCheck = 0;
-unsigned long Debug::debugPushCheckSum = 0;
-unsigned long Debug::debugRenderCheck = 0;
-unsigned long Debug::debugRenderCheckSum = 0;
-unsigned long Debug::debugRenderCheckCount = 0;
+
+unsigned long Debug::pushTime = 0;
+unsigned long Debug::pushTimeSum = 0;
+
+unsigned long Debug::prerenderTime = 0;
+unsigned long Debug::prerenderTimeSum = 0;
+uint16_t Debug::renderCallsCount = 0;
+
+unsigned long Debug::renderTime = 0;
+unsigned long Debug::renderTimeSum = 0;

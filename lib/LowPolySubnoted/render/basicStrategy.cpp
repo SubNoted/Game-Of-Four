@@ -2,6 +2,7 @@
 
 void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) 
 {
+    Debug::prerenderTimeSum += micros() - Debug::prerenderTime;
     for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {
         Debug::renderTime = micros();

@@ -41,6 +41,7 @@ void SceneManager::render() {
 
 
     //render
+    Debug::prerenderTime = micros();
     if (currentScene) {
         renderer.renderScene(currentScene);
     }
@@ -57,6 +58,7 @@ void SceneManager::render() {
         log_d("PhysCallsPS: %d", Debug::physicsCalls);
         log_d("Push time: %lumcs", Debug::pushTimeSum/Debug::frameCalls);
         // log_d("Render time: %dmcs", Debug::renderTimeSum/Debug::renderTimeCount);
+        log_d("PreRender time: %dmcs", Debug::prerenderTimeSum/Debug::frameCalls);
         log_d("Render time: %dmcs", Debug::renderTimeSum/Debug::frameCalls);
         // log_d("Render calls: %d", Debug::renderTimeCount);
         log_d("Vertecies size: %d", currentScene->vertices.size());
@@ -77,6 +79,7 @@ void SceneManager::render() {
         Debug::physicsCalls = 0;
         Debug::pushTimeSum = 0;
         Debug::renderTimeSum = 0;
+        Debug::prerenderTimeSum = 0;
         Debug::renderCallsCount = 0;
     }
 #endif
