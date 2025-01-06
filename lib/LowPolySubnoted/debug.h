@@ -9,11 +9,15 @@ class Debug{
 public:
     static uint16_t frameCalls;
     static uint16_t physicsCalls;
-    static unsigned long debugPushCheck;
-    static unsigned long debugPushCheckSum;
-    static unsigned long debugRenderCheck;
-    static unsigned long debugRenderCheckSum;
-    static unsigned long debugRenderCheckCount;
+    static unsigned long pushTime;
+    static unsigned long pushTimeSum;
+    static unsigned long renderTime;
+    static unsigned long renderTimeSum;
+    static unsigned long renderCallsCount;
+
+    static unsigned long prerenderTime;
+
+
 };
 
 
