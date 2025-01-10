@@ -19,8 +19,6 @@ public:
 
     
     std::vector<Entity*> entities = std::vector<Entity*>(); //todo entity accessable across scenes
-
-    Vector lightDirection = Vector(0,-0.5,1); //todo in UnitVector
     
 protected:
 

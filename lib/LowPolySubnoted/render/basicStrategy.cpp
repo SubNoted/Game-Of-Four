@@ -106,32 +106,38 @@ void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, i
 
 
 
-void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) 
+void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) 
 {
     Debug::prerenderTimeSum += micros() - Debug::prerenderTime;
+
     for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {
         Debug::renderTime = micros();
         canvas[cnvsNum].fillScreen(TFT_CYAN);
-        for (uint8_t i = 0; i < scene->polygons.size(); i++) 
-        {
-            Vector verts[3] = {scene->vertices[scene->polygons[i].vertices[0]], 
-                       scene->vertices[scene->polygons[i].vertices[1]], 
-                       scene->vertices[scene->polygons[i].vertices[2]]};
-    
-            verts[0].toFOV_XY(scene->FOV);
-            verts[1].toFOV_XY(scene->FOV);
-            verts[2].toFOV_XY(scene->FOV);
-            
-            Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
-            if (normal.z < 0) continue;
 
-            uint16_t color = TFT_WHITE;
-            float shade = normal.ScalarProd(scene->lightDirection)/3+0.5;
-            color = canvas[cnvsNum].alphaBlend(shade*255, color, TFT_CYAN);
-            
-            // canvas[cnvsNum].pushImage
-            // canvas[cnvsNum].fillTriangle
+        //actual rendering
+        for (uint8_t ent = 0; ent < entities.size(); ent++) 
+        {
+            for (uint8_t i = 0; i < entities[ent]->polySize; i++) 
+            {
+                Vector verts[3] = {entities[ent]->vertices[entities[ent]->polygons[i].vertices[0]], 
+                        entities[ent]->vertices[entities[ent]->polygons[i].vertices[1]], 
+                        entities[ent]->vertices[entities[ent]->polygons[i].vertices[2]]};
+        
+                verts[0].toFOV_XY(FOV);
+                verts[1].toFOV_XY(FOV);
+                verts[2].toFOV_XY(FOV);
+                
+                Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
+                if (i == 0) log_d("normal: %d, %d, %d", normal.x, normal.y, normal.z);
+                if (normal.z < 0) continue;
+
+                uint16_t color = TFT_WHITE;
+                float shade = normal.ScalarProd(lightDirection)/3+0.5; //todo optimize to unitvector
+                color = canvas[cnvsNum].alphaBlend(shade*255, color, TFT_CYAN);
+                
+                // canvas[cnvsNum].pushImage
+                // canvas[cnvsNum].fillTriangle
 
             // pushImage(100,100, 100, 100, cnvsPtr[cnvsNum], cloudsTex);
 
@@ -146,14 +152,15 @@ void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& 
                 // color
             );
 #if DEBUG_MODE
-            canvas[cnvsNum].drawTriangle(
-                verts[0].x, verts[0].y,
-                verts[1].x, verts[1].y,
-                verts[2].x, verts[2].y,
-                TFT_DARKGREY
-            );
+                canvas[cnvsNum].drawTriangle(
+                    verts[0].x, verts[0].y,
+                    verts[1].x, verts[1].y,
+                    verts[2].x, verts[2].y,
+                    TFT_DARKGREY
+                );
 #endif
 
+            }
         }
 
         Debug::renderTimeSum += micros() - Debug::renderTime;

@@ -16,7 +16,7 @@ public:
         strategy = std::move(newStrategy);
     }
 
-    void setGlobalLightDirection(UnitVector& lightDirection) {
+    void setGlobalLightDirection(Vector& lightDirection) {
         strategy->lightDirection = lightDirection;//setGlobalLightDirection(lightDirection);
     }
 
