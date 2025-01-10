@@ -22,7 +22,7 @@ void  pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint
     }
 }
 
-void pushImageTriangleToSprite(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint16_t* _img, uint8_t* data)
+void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint16_t* _img, uint8_t* data)
 {
     int32_t a, b, y, last;
     
@@ -137,7 +137,7 @@ void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& 
 
             // canvas[cnvsNum].pushImage(0,0, 256, 256, cloudsTex);
 
-            pushImageTriangleToSprite(
+            pushImageTriangleToCanvas(
                 verts[0].x, verts[0].y,
                 verts[1].x, verts[1].y,
                 verts[2].x, verts[2].y,
