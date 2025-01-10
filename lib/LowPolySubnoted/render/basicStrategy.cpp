@@ -160,9 +160,4 @@ void BasicRendererStrategy::renderScene(std::shared_ptr<Scene> scene, TFT_eSPI& 
         Debug::renderCallsCount++;
         tft.pushImageDMA(0, SCRN_HEIGHT/SPLIT_SCREEN*cnvsNum, SCRN_WIDTH, SCRN_HEIGHT/SPLIT_SCREEN, cnvsPtr[cnvsNum]);
     }
-
-}
-
-void BasicRendererStrategy::renderPolygons(std::shared_ptr<Scene> scene, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) {
-    
 }

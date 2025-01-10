@@ -6,11 +6,15 @@
 #include <vector>
 
 #include "selfGFX/entity.h"
+#include "scene/settings.h"
 
 class IRendererStrategy {
 public:
     virtual ~IRendererStrategy() = default;
     virtual void renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) = 0;
+    
+    UnitVector lightDirection;
+    float FOV = Settings::fov;
 };
 
 #endif // I_RENDER_STRATEGY_H

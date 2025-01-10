@@ -1,17 +1,7 @@
 #ifndef GRAPHICS_RENDERER_H
 #define GRAPHICS_RENDERER_H
 
-
-// #include <TFT_eSPI.h> 
-
 #include "iRendererStrategy.h"
-
-// #include "lowPoly.h"
-
-// #include "vector.h"
-// #include "selfGFX/polygon.h"
-
-#include "scene/settings.h"
 
 class GraphicsRenderer {
 public:
@@ -24,6 +14,14 @@ public:
     
     void setStrategy(std::unique_ptr<IRendererStrategy> newStrategy) {
         strategy = std::move(newStrategy);
+    }
+
+    void setGlobalLightDirection(UnitVector& lightDirection) {
+        strategy->lightDirection = lightDirection;//setGlobalLightDirection(lightDirection);
+    }
+
+    void setFOV(float& newFOV) {
+        strategy->FOV = newFOV;
     }
 
     std::unique_ptr<IRendererStrategy> strategy = nullptr;
