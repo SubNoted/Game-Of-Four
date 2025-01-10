@@ -4,16 +4,14 @@
 
 void SceneManager::changeScene(std::shared_ptr<Scene> newScene) {
     if (currentScene) {
-        currentScene->vertices.clear();
-        currentScene->polygons.clear();
+        currentScene->entities.clear();
         currentScene->exit();
 
         last4deltaTime = millis();
     }
     currentScene = std::move(newScene);
 
-    currentScene->vertices.reserve(8);
-    currentScene->polygons.reserve(12);
+    currentScene->entities.reserve(1);
 
     currentScene->setSceneManager(this);
     currentScene->enter();
@@ -43,7 +41,7 @@ void SceneManager::render() {
     //render
     Debug::prerenderTime = micros();
     if (currentScene) {
-        renderer.renderScene(currentScene);
+        renderer.renderScene(currentScene->entities);
     }
 
 
@@ -61,8 +59,6 @@ void SceneManager::render() {
         log_d("PreRender time: %dmcs", Debug::prerenderTimeSum/Debug::frameCalls);
         log_d("Render time: %dmcs", Debug::renderTimeSum/Debug::frameCalls);
         // log_d("Render calls: %d", Debug::renderTimeCount);
-        log_d("Vertecies size: %d", currentScene->vertices.size());
-        log_d("Polygons size: %d \n", currentScene->polygons.size());
         
         log_d("Memory info\n\tPSRAM - \tTotal: %u,\tUsed: %u,\tFree: %u,\tBiggest free block: %u\n\tInternal - \tTotal: %u,\tUsed: %u,\tFree: %u,\tBiggest free block: %u\n\n\n", 
             heap_caps_get_total_size(MALLOC_CAP_SPIRAM),

@@ -3,11 +3,8 @@
 
 // #include "lowPoly.h"
 #include <vector>
-// #include <selfGFX/renderer.h>
 
-
-// #include "selfGFX/vector.h"
-#include "render/selfGFX/Entity.h"
+#include <render/renderer.h>
 #include "settings.h"
 
 class SceneManager; // Forward declaration
@@ -21,16 +18,9 @@ public:
     virtual void exit() = 0;
 
     
-    std::vector<Vector> vertices = std::vector<Vector>();
-    std::vector<Polygon> polygons = std::vector<Polygon>();
+    std::vector<Entity*> entities = std::vector<Entity*>(); //todo entity accessable across scenes
 
     Vector lightDirection = Vector(0,-0.5,1); //todo in UnitVector
-
-    
-    float FOV = Settings::fov;
-
-
-    
     
 protected:
 

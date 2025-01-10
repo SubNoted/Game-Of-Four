@@ -81,7 +81,7 @@ void Tscene::enter() {
     // canvas[0].fillScreen(TFT_BLUE * 0.5);
     // canvas[1].fillScreen(TFT_BLUE * 0.5);
 
-    cube.init(&polygons, &vertices);
+    cube.init(entities);
     cube.createCube(Vector(x, y, 100), Vector(size));
     //cube.setRotation(Vector(0,10,20));
 }

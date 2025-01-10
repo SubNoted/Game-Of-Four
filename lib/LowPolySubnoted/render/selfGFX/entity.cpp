@@ -215,30 +215,31 @@ void Entity::processPhysics(float &t)
 
 Entity::Entity()
 {
-    this->vertices = nullptr;
-    this->polygons = nullptr;
+    
 }
 
-Entity::Entity(std::vector<Polygon>* polygons, std::vector<Vector>* vertices)
+Entity::Entity(std::vector<Entity*>& entities)
 {
-    this->vertices = vertices;
-    this->polygons = polygons;
+    init(entities);
 }
 
 
-void Entity::init(std::vector<Polygon>* polygons, std::vector<Vector>* vertices)
+void Entity::init(std::vector<Entity*>& entities)
 {
-    this->vertices = vertices;
-    this->polygons = polygons;
+    entities.push_back(this);
 }
 
 
 void Entity::createCube(Vector o, Vector size)
 {
     //todo deinit if exists
-    this->O.Equals(o);
+    this->O.Equals(o); 
     this->Size.Equals(size);
     this->Update = true;
+    this->vertSize = 8;
+    this->polySize = 12;
+    this->vertices = new Vector[vertSize];
+    this->polygons = new Polygon[polySize];
 
 //          4----------5         
 //        /          / |        
@@ -249,47 +250,46 @@ void Entity::createCube(Vector o, Vector size)
 //   |          | /          
 //   3----------2     
 
-    verStartNum = vertices->size();
-    verSize = 8;
 
-    vertices->push_back(Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
-    vertices->push_back(Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
-    vertices->push_back(Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
-    vertices->push_back(Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
+    vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
+    vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
+    vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
+    vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
 
-    vertices->push_back(Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
-    vertices->push_back(Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
-    vertices->push_back(Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
-    vertices->push_back(Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
+    vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
+    vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
+    vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
+    vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
 
-    //0-1-2-3
-    polygons->push_back(Polygon(verStartNum, verStartNum + 1, verStartNum + 2));
-    polygons->push_back(Polygon(verStartNum, verStartNum + 2, verStartNum + 3));
 
     for (int i = 0; i < 4; i++)
     {
-        polygons->push_back(Polygon(verStartNum + i, verStartNum + 4 + (i + 1) % 4, verStartNum + (i+1)%4));
-        polygons->push_back(Polygon(verStartNum + i, verStartNum + 4 + i, verStartNum + 4 + (i + 1) % 4));
+        polygons[i*2] = (Polygon(i, 4 + (i + 1) % 4, (i+1)%4));
+        polygons[i*2 + 1] = (Polygon(i, 4 + i, 4 + (i + 1) % 4));
     }
 
+    //0-1-2-3
+    polygons[8] = (Polygon(0, 1, 2));
+    polygons[9] = (Polygon(0, 2, 3));
+
     //4-5-6-7
-    polygons->push_back(Polygon(verStartNum+4, verStartNum + 6, verStartNum + 5));
-    polygons->push_back(Polygon(verStartNum+4, verStartNum + 7, verStartNum + 6));
+    polygons[10] = (Polygon(4, 6, 5));
+    polygons[11] = (Polygon(4, 7, 6));
 
 }
 
 
 void Entity::setCube()
 {
-    (*vertices)[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
-    (*vertices)[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
-    (*vertices)[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
-    (*vertices)[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
+    vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
+    vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
+    vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
+    vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
 
-    (*vertices)[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
-    (*vertices)[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
-    (*vertices)[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
-    (*vertices)[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
+    vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
+    vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
+    vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
+    vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
 
 }
 
@@ -317,15 +317,15 @@ Vector Entity::getSize()
 }
 void Entity::setRotation(Vector v)
 {    
-    (*vertices)[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
-    (*vertices)[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
-    (*vertices)[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
-    (*vertices)[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
+    vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
+    vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
+    vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
+    vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
 
-    (*vertices)[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
-    (*vertices)[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
-    (*vertices)[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
-    (*vertices)[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
+    vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
+    vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
+    vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
+    vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
 }
 void Entity::rotate(Vector v)
 {
@@ -334,9 +334,9 @@ void Entity::rotate(Vector v)
     // this->Angle.Equals(v);
     // Update = true;
 
-    for (int i = verStartNum; i < verSize; i++)
+    for (int i = 0; i < vertSize; i++)
     {
-        (*vertices)[i].Rotate(v, O);
+        vertices[i].Rotate(v, O);
     }
 }
 Vector Entity::getAngle()

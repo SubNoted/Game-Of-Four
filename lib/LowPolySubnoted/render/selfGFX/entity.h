@@ -17,12 +17,19 @@
 
 class Entity
 {
+
+protected:
+    friend class GraphicsRenderer;
+    friend class IRendererStrategy;
+    friend class BasicRendererStrategy;
+
+    Vector* vertices;
+    Polygon* polygons;
+
+    uint16_t vertSize;
+    uint16_t polySize;
+
 private:
-
-    // Scene *scene;
-    std::vector<Polygon>* polygons = nullptr;
-    std::vector<Vector>* vertices = nullptr;
-
 
     // static Vector2 Camera;
     // static Vector2 last_Camera;
@@ -63,8 +70,6 @@ public:
     // static float *FOV;
     // static float *last_FOV;
     // static uint16_t *BG_COL;
-    
-    uint16_t verStartNum = 0, verSize = 0;
 
     Vector O;
     Vector Size;
@@ -82,9 +87,9 @@ public:
     Vector lightDirection;
 
     Entity();
-    Entity(std::vector<Polygon>* polygons, std::vector<Vector>* vertices);
-    void init(std::vector<Polygon>* polygons, std::vector<Vector>* vertices);
-    void reInit(std::vector<Polygon>* polygons, std::vector<Vector>* vertices);
+    Entity(std::vector<Entity*>& entities);
+    void init(std::vector<Entity*>& entities);
+    void reInit(std::vector<Entity*>& entities);
 
     void createCube(Vector o, Vector size);
 

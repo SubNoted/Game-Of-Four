@@ -1,7 +1,6 @@
 #ifndef GRAPHICS_RENDERER_H
 #define GRAPHICS_RENDERER_H
 
-#include <vector>
 
 // #include <TFT_eSPI.h> 
 
@@ -9,12 +8,10 @@
 
 // #include "lowPoly.h"
 
-// #include "entity.h"
 // #include "vector.h"
 // #include "selfGFX/polygon.h"
 
 #include "scene/settings.h"
-#include "scene/scene.h"
 
 class GraphicsRenderer {
 public:
@@ -23,7 +20,7 @@ public:
 
     void init();
 
-    void renderScene(std::shared_ptr<Scene> scene);
+    void renderScene(std::vector<Entity*>& entities);
     
     void setStrategy(std::unique_ptr<IRendererStrategy> newStrategy) {
         strategy = std::move(newStrategy);

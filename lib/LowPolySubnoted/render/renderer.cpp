@@ -22,11 +22,11 @@ void GraphicsRenderer::init()
     
 }
 
-void GraphicsRenderer::renderScene(std::shared_ptr<Scene> scene)
+void GraphicsRenderer::renderScene(std::vector<Entity*>& entities)
 {
     if (tft.dmaBusy())
         return;
     
     Debug::frameCalls++;
-    strategy->renderScene(scene, tft, canvas, cnvsPtr);
+    strategy->renderScene(entities, tft, canvas, cnvsPtr);
 }
