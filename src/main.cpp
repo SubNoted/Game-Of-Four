@@ -9,7 +9,7 @@
 /////////scenes////////////
 #include "sceneTest.h"//test scene
 
-#include "cloudsTex.h"
+// #include "cloudsTex.h"
 
 
 LowPoly lowPoly;
@@ -21,7 +21,7 @@ void core0(void * pvParameters);
 ////////////////SETUP/////////////////////////////////
 void setup() 
 {
-log_d("image size %d", sizeof(cloudsTex));
+// log_d("image size %d", sizeof(cloudsTex));
  uint32_t size_flash_chip;
 esp_flash_get_size(NULL, &size_flash_chip);
 log_d("flash size %d", size_flash_chip);

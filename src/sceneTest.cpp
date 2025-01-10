@@ -30,7 +30,7 @@ void Tscene::update(uint32_t deltaTime)
 #endif
 
     if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
-        cube.rotate(Vector(0,-0.01*deltaTime*input_x,-0.01*deltaTime*input_y));
+        cube.rotate(Vector(0,-0.005*deltaTime*input_x,-0.005*deltaTime*input_y));
     // cube.setRotation(Vector(0.002*millis(),0,y));
 }
 
