@@ -9,6 +9,8 @@
 /////////scenes////////////
 #include "sceneTest.h"//test scene
 
+#include "cloudsTex.h"
+
 
 LowPoly lowPoly;
 SceneManager sceneManager;
@@ -19,6 +21,11 @@ void core0(void * pvParameters);
 ////////////////SETUP/////////////////////////////////
 void setup() 
 {
+log_d("image size %d", sizeof(cloudsTex));
+ uint32_t size_flash_chip;
+esp_flash_get_size(NULL, &size_flash_chip);
+log_d("flash size %d", size_flash_chip);
+
     pinMode(12, ANALOG);
 
     ////esp32////
@@ -41,8 +48,7 @@ void setup()
     sceneManager.initRenderer();
     sceneManager.changeScene(std::shared_ptr<Tscene>(new Tscene()));//set test scene
     
-    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0); 
-
+    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0);
 }
 
 void loop() 
