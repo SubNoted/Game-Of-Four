@@ -1,5 +1,7 @@
 #include "sceneTest.h"
 
+#include <cloudsTex.h>
+
 // uint16_t BG_COL = Scene::tft->color565(104,144,195); //test color
 
 // UnitVector light = UnitVector(0,0,255);
@@ -83,6 +85,12 @@ void Tscene::enter() {
 
     cube.init(entities);
     cube.createCube(Vector(x, y, 100), Vector(size));
+
+    //texture
+    cube.texture = cloudsTex; //alloc ram memory for texture
+    cube.textureHeight = 256;
+    cube.textureWidth = 256;
+
     //cube.setRotation(Vector(0,10,20));
 }
 

@@ -1,13 +1,9 @@
 #include "basicStrategy.h"
 
-
-#include "cloudsTex.h"
-
 ///////////////////* my extra (for TFT_eSPI (ripped of TFT_eSPI) ) /////////////
 
 void  pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint8_t *data)
 {
-    if (data == nullptr) return;  
 
     // Pointer within original image
     uint8_t *ptro = data + ((x + y * 256) << 1);
@@ -24,6 +20,8 @@ void  pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint
 
 void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint16_t* _img, uint8_t* data)
 {
+    if (data == nullptr) return;  
+    
     int32_t a, b, y, last;
     
 
@@ -116,9 +114,9 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
         canvas[cnvsNum].fillScreen(TFT_CYAN);
 
         //actual rendering
-        for (uint8_t ent = 0; ent < entities.size(); ent++) 
+        for (uint8_t ent = 0; ent < entities.size(); ent++) //entities
         {
-            for (uint8_t i = 0; i < entities[ent]->polySize; i++) 
+            for (uint8_t i = 0; i < entities[ent]->polySize; i++) //polygons
             {
                 Vector verts[3] = {entities[ent]->vertices[entities[ent]->polygons[i].vertices[0]], 
                         entities[ent]->vertices[entities[ent]->polygons[i].vertices[1]], 
@@ -129,7 +127,7 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 verts[2].toFOV_XY(FOV);
                 
                 Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
-                if (i == 0) log_d("normal: %d, %d, %d", normal.x, normal.y, normal.z);
+                
                 if (normal.z < 0) continue;
 
                 uint16_t color = TFT_WHITE;
@@ -139,18 +137,18 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 // canvas[cnvsNum].pushImage
                 // canvas[cnvsNum].fillTriangle
 
-            // pushImage(100,100, 100, 100, cnvsPtr[cnvsNum], cloudsTex);
+                // pushImage(100,100, 100, 100, cnvsPtr[cnvsNum], cloudsTex);
 
-            // canvas[cnvsNum].pushImage(0,0, 256, 256, cloudsTex);
+                // canvas[cnvsNum].pushImage(0,0, 256, 256, cloudsTex);
 
-            pushImageTriangleToCanvas(
-                verts[0].x, verts[0].y,
-                verts[1].x, verts[1].y,
-                verts[2].x, verts[2].y,
-                cnvsPtr[cnvsNum],
-                cloudsTex
-                // color
-            );
+                pushImageTriangleToCanvas(
+                    verts[0].x, verts[0].y,
+                    verts[1].x, verts[1].y,
+                    verts[2].x, verts[2].y,
+                    cnvsPtr[cnvsNum],
+                    entities[ent]->texture
+                    // color
+                );
 #if DEBUG_MODE
                 canvas[cnvsNum].drawTriangle(
                     verts[0].x, verts[0].y,
