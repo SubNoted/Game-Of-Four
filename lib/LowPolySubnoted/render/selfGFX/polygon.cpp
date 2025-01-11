@@ -14,12 +14,6 @@ void Polygon::setVertices(const uint16_t& v0, const uint16_t& v1, const uint16_t
     vertices[2] = v2;
 }
 
-UnitVector Polygon::getNormal()
-{
-    return UnitVector(vertices[0], vertices[1], vertices[2]);//todo test
-
-}
-
 //////////////////SmoothPolygon////////////////////////////////
 
 SmoothPolygon::SmoothPolygon() {}

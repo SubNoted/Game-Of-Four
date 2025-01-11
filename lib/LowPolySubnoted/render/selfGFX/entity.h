@@ -11,7 +11,6 @@
 // #include "color.h"
 // #include "texture.h"
 // #include "material.h"
-#include <vector>
 
 // #include "scene/scene.h"
 
@@ -64,17 +63,20 @@ private:
     void setCube();
 
 public:
-    // static TFT_eSprite *sprite;
     // static uint16_t SCREEN_WIDTH;
     // static uint16_t SCREEN_HEIGHT;
-    // static float *FOV;
-    // static float *last_FOV;
-    // static uint16_t *BG_COL;
 
     Vector O;
     Vector Size;
     Vector Angle;
-    uint16_t Color;
+
+    //Texture
+    uint8_t* texture;
+    uint8_t textureHeight, textureWidth;
+
+    uint16_t Color; //for WO texture
+
+
     // String Text[3];
     // Vector2 textOffSet;
     // float textSize;

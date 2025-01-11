@@ -469,12 +469,12 @@ UnitVector::UnitVector(uint8_t x, uint8_t y, uint8_t z)
     this->y = y;
     this->z = z;
 }
-UnitVector::UnitVector(Vector& a, Vector& b, Vector& c)
+UnitVector::UnitVector(Vector& a, Vector& b, Vector& c)//normal
 {
     Vector ab = b.Delta(a), ac = c.Delta(a);
-    this->x = uint8_t((ab.y * ac.z - ab.z * ac.y)*255);
-    this->y = uint8_t((ab.z * ac.x - ab.x * ac.z)*255);
-    this->z = uint8_t((ab.x * ac.y - ab.y * ac.x)*255);
+    this->x = uint8_t((ab.y * ac.z - ab.z * ac.y) );
+    this->y = uint8_t((ab.z * ac.x - ab.x * ac.z) );
+    this->z = uint8_t((ab.x * ac.y - ab.y * ac.x) );
 }
 
 bool UnitVector::isEqual(UnitVector v)

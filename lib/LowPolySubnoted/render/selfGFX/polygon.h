@@ -11,17 +11,13 @@ private:
 
 public:
     uint16_t vertices[3]; //number of vertices in scene
-
-    UnitVector getNormal();
-
-    UnitVector normal;
+    uint8_t uv[3][2];
     
     Polygon(void);
     Polygon(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2);
     void setVertices(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2);
     void draw();
 };
-
 class SmoothPolygon
 {
 private:
