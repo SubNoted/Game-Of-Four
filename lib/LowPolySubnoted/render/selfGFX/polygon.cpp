@@ -14,6 +14,16 @@ void Polygon::setVertices(const uint16_t& v0, const uint16_t& v1, const uint16_t
     vertices[2] = v2;
 }
 
+void Polygon::setUV(uint8_t uvx0,uint8_t uvy0, uint8_t uvx1,uint8_t uvy1, uint8_t uvx2,uint8_t uvy2)
+{
+    uv[0][0] = uvx0;
+    uv[0][1] = uvy0;
+    uv[1][0] = uvx1;
+    uv[1][1] = uvy1;
+    uv[2][0] = uvx2;
+    uv[2][1] = uvy2;
+}
+
 //////////////////SmoothPolygon////////////////////////////////
 
 SmoothPolygon::SmoothPolygon() {}

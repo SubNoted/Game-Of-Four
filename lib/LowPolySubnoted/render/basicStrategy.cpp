@@ -2,7 +2,7 @@
 
 ///////////////////* my extra (for TFT_eSPI (ripped of TFT_eSPI) ) /////////////
 
-void  pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint8_t *data)
+void  pushImageLine(int32_t x, int32_t y, int32_t w, uint16_t *_img, uint8_t *data)
 {
 
     // Pointer within original image
@@ -10,7 +10,7 @@ void  pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint
     // Pointer within sprite image
     uint8_t *ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
-    while (h--)
+    // while (h--)
     {
         memcpy(ptrs, ptro, (w<<1));
         ptro += 256<<1;
@@ -18,22 +18,31 @@ void  pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint
     }
 }
 
-void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, uint16_t* _img, uint8_t* data)
+void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int32_t x2,int32_t y2, \
+                               uint8_t uvx0,uint8_t uvy0, uint8_t uvx1,uint8_t uvy1, uint8_t uvx2,uint8_t uvy2, \
+                               uint16_t* _img, uint8_t* data)
 {
     if (data == nullptr) return;  
     
-    int32_t a, b, y, last;
-    
+    int32_t a, b, y, x, last, maxX, dX;
+    uint8_t *ptro, *ptrs;
+
+    maxX = max(x0, max(x1, x2));
+    dX = maxX - min(x0, min(x1, x2));
+    if (dX == 0) return;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
     if (y0 > y1) {
         transpose(y0, y1); transpose(x0, x1);
+        transpose(uvy0, uvy1); transpose(uvx0, uvx1);
     }
     if (y1 > y2) {
         transpose(y2, y1); transpose(x2, x1);
+        transpose(uvy2, uvy1); transpose(uvx2, uvx1);
     }
     if (y0 > y1) {
         transpose(y0, y1); transpose(x0, x1);
+        transpose(uvy0, uvy1); transpose(uvx0, uvx1);
     }
 
     if (y0 == y2) { // Handle awkward all-on-same-line case as its own thing
@@ -46,7 +55,10 @@ void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, i
         // drawFastHLine(a, y0, b - a + 1, color);
         // sprite.drawFastHLine(a, y0, b - a + 1, TFT_DARKGREY);
 
-        pushImage(a, y0, b - a + 1, 1, _img, data);
+        ptro = data + ((x + y * 256) << 1);
+        ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+        memcpy(ptrs, ptro, 2);
 
 
         return;
@@ -71,6 +83,7 @@ void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, i
     if (y1 == y2) last = y1;  // Include y1 scanline
     else         last = y1 - 1; // Skip it
 
+    //if (x0 != x2)
     for (y = y0; y <= last; y++) {
         a   = x0 + sa / dy01;
         b   = x0 + sb / dy02;
@@ -80,7 +93,17 @@ void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, i
         if (a > b) transpose(a, b);        
         // sprite.drawFastHLine(a, y, b - a + 1, TFT_DARKGREY);
         
-        pushImage(a, y, b - a + 1, 1, _img, data);
+        // pushImageLine(a, y, b - a + 1, _img, data);
+        
+        for (x = a; x <= b; x++)
+        {
+            // pushImageLine(x, y, 1, _img, data);
+            
+            ptro = data + ((uint8_t((uvx2-uvx0)*(x)/(dX)) + uint8_t((uvy2-uvy0)*(y)/(y2-y0)) * 256) << 1);
+            ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+            memcpy(ptrs, ptro, 2);
+        }
         
     }
 
@@ -97,7 +120,16 @@ void pushImageTriangleToCanvas(int32_t x0, int32_t y0, int32_t x1, int32_t y1, i
         if (a > b) transpose(a, b);
         // sprite.drawFastHLine(a, y, b - a + 1, TFT_DARKGREY);
 
-        pushImage(a, y, b - a + 1, 1, _img, data);
+        // pushImageLine(a, y, b - a + 1, _img, data);
+
+        for (x = a; x < b + 1; x++)
+        {
+            // ptro = data + ((x + y * 256) << 1);
+            ptro = data + ((uint8_t((uvx2-uvx1)*(x)/(dX)) + uint8_t((uvy2-uvy1)*(y)/(y2-y0)) * 256) << 1);
+            ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+            memcpy(ptrs, ptro, 2);
+        }
 
     }
 }
@@ -118,10 +150,10 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
         {
             for (uint8_t i = 0; i < entities[ent]->polySize; i++) //polygons
             {
-                Vector verts[3] = {entities[ent]->vertices[entities[ent]->polygons[i].vertices[0]], 
-                        entities[ent]->vertices[entities[ent]->polygons[i].vertices[1]], 
-                        entities[ent]->vertices[entities[ent]->polygons[i].vertices[2]]};
-        
+                Vector verts[3] = { entities[ent]->vertices[entities[ent]->polygons[i].vertices[0]], 
+                                    entities[ent]->vertices[entities[ent]->polygons[i].vertices[1]], 
+                                    entities[ent]->vertices[entities[ent]->polygons[i].vertices[2]]};
+                
                 verts[0].toFOV_XY(FOV);
                 verts[1].toFOV_XY(FOV);
                 verts[2].toFOV_XY(FOV);
@@ -145,9 +177,11 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                     verts[0].x, verts[0].y,
                     verts[1].x, verts[1].y,
                     verts[2].x, verts[2].y,
+                    entities[ent]->polygons[i].uv[0][0],entities[ent]->polygons[i].uv[0][1],
+                    entities[ent]->polygons[i].uv[1][0],entities[ent]->polygons[i].uv[1][1],
+                    entities[ent]->polygons[i].uv[2][0],entities[ent]->polygons[i].uv[2][1],
                     cnvsPtr[cnvsNum],
                     entities[ent]->texture
-                    // color
                 );
 #if DEBUG_MODE
                 canvas[cnvsNum].drawTriangle(

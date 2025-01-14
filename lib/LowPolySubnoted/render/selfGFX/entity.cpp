@@ -103,17 +103,23 @@ void Entity::createCube(Vector o, Vector size)
 
     for (int i = 0; i < 4; i++)
     {
-        polygons[i*2] = (Polygon(i, 4 + (i + 1) % 4, (i+1)%4));
+        polygons[i*2] = (Polygon(i, 4 + (i + 1) % 4, (i+1)%4));//todo setVert
+        polygons[i*2].setUV(0, 0, 255, 255, 255, 0);
         polygons[i*2 + 1] = (Polygon(i, 4 + i, 4 + (i + 1) % 4));
+        polygons[i*2 + 1].setUV(0, 0, 0, 255, 255, 255);
     }
 
     //0-1-2-3
     polygons[8] = (Polygon(0, 1, 2));
+    polygons[8].setUV(0, 255, 255, 255, 255, 0);
     polygons[9] = (Polygon(0, 2, 3));
+    polygons[9].setUV(0, 255, 255, 0, 0, 0);
 
     //4-5-6-7
     polygons[10] = (Polygon(4, 6, 5));
+    polygons[10].setUV(0, 255, 255, 255, 255, 0);//todo fix mapping
     polygons[11] = (Polygon(4, 7, 6));
+    polygons[11].setUV(0, 255, 255, 0, 0, 0);//todo fix mapping
 
 }
 

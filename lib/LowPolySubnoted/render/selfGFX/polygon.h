@@ -15,7 +15,6 @@ public:
     PolygonWOTex(void);
     PolygonWOTex(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2);
     void setVertices(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2);
-    void draw();
 };
 
 class Polygon
@@ -29,7 +28,7 @@ public:
     Polygon(void);
     Polygon(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2);
     void setVertices(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2);
-    void draw();
+    void setUV(uint8_t uvx0,uint8_t uvy0, uint8_t uvx1,uint8_t uvy1, uint8_t uvx2,uint8_t uvy2);
 };
 class SmoothPolygon
 {
