@@ -83,7 +83,7 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
     if (y1 == y2) last = y1;  // Include y1 scanline
     else         last = y1 - 1; // Skip it
 
-    //if (x0 != x2)
+    if (x0 != x1)
     for (y = y0; y <= last; y++) {
         a   = x0 + sa / dy01;
         b   = x0 + sb / dy02;
@@ -98,8 +98,8 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
         for (x = a; x <= b; x++)
         {
             // pushImageLine(x, y, 1, _img, data);
-            
-            ptro = data + ((uint8_t((uvx2-uvx0)*(x)/(dX)) + uint8_t((uvy2-uvy0)*(y)/(y2-y0)) * 256) << 1);
+            if (b==a) break;
+            ptro = data + ((uint8_t((uvx2-uvx0)*(x-a)/(b-a)) + uint8_t((uvy2-uvy0)*(y-y0)/(y2-y0)) * 256) << 1);
             ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
             memcpy(ptrs, ptro, 2);
@@ -111,6 +111,7 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
     // 0-2 and 1-2.  This loop is skipped if y1=y2.
     sa = dx12 * (y - y1);
     sb = dx02 * (y - y0);
+    if (x2 != x1)
     for (; y <= y2; y++) {
         a   = x1 + sa / dy12;
         b   = x0 + sb / dy02;
@@ -125,7 +126,8 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
         for (x = a; x < b + 1; x++)
         {
             // ptro = data + ((x + y * 256) << 1);
-            ptro = data + ((uint8_t((uvx2-uvx1)*(x)/(dX)) + uint8_t((uvy2-uvy1)*(y)/(y2-y0)) * 256) << 1);
+            if (b==a) break;
+            ptro = data + ((uint8_t((uvx2-uvx0)*(x-a)/(b-a)) + uint8_t((uvy2-uvy0)*(y-y0)/(y2-y0)) * 256) << 1);
             ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
             memcpy(ptrs, ptro, 2);
