@@ -24,7 +24,7 @@ void GraphicsRenderer::init()
 
 void GraphicsRenderer::renderScene(std::vector<Entity*>& entities)
 {
-    if (tft.dmaBusy())
+    if (tft.dmaBusy())//todo optimize
         return;
     
     Debug::frameCalls++;

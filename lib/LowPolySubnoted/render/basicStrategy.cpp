@@ -18,14 +18,14 @@ void  pushImageLine(int32_t x, int32_t y, int32_t w, uint16_t *_img, uint8_t *da
     }
 }
 
-void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int32_t x2,int32_t y2, \
+void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int16_t x2,int16_t y2, \
                                uint8_t uvx0,uint8_t uvy0, uint8_t uvx1,uint8_t uvy1, uint8_t uvx2,uint8_t uvy2, \
                                uint16_t* _img, uint8_t* data)
 {
     if (data == nullptr) return;  
     
-    int32_t a, b, y, x, last;
-    float w0, w1, w2, S;
+    int16_t a, b, y, x, last, S;
+    uint8_t w0, w1, w2;
     uint8_t *ptro, *ptrs;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
@@ -42,7 +42,6 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
         transpose(uvy0, uvy1); transpose(uvx0, uvx1);
     }
 
-    S = ((y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2));
 
     if (y0 == y2) { // Handle awkward all-on-same-line case as its own thing
         a = b = x0;
@@ -63,7 +62,7 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
         return;
     }
 
-    int32_t
+    int16_t
     dx01 = x1 - x0,
     dy01 = y1 - y0,
     dx02 = x2 - x0,
@@ -72,6 +71,10 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
     dy12 = y2 - y1,
     sa   = 0,
     sb   = 0;
+
+    
+    S = (dy12 * dx02 - dx12 * dy02);
+    if (S == 0) return;
 
     // For upper part of triangle, find scanline crossings for segments
     // 0-1 and 0-2.  If y1=y2 (flat-bottomed triangle), the scanline y1
@@ -95,17 +98,11 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
         
         for (x = a; x <= b; x++)
         {
-            // pushImageLine(x, y, 1, _img, data);
-
-            w0 = ((y1 - y2) * (x - x2) + (x2 - x1) * (y - y2)) / S;
-            w1 = ((y2 - y0) * (x - x2) + (x0 - x2) * (y - y2)) / S;
-            w2 = 1 - w0 - w1;
+            w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
+            w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
+            w2 = 255 - w0 - w1;
             
-            // ptro = data + ((x + y * 256) << 1);
-            if (a==b) break;
-            
-            // ptro = data + ((uint8_t((uvx2-uvx0)*(x-minX)/(dX)) + uint8_t((uvy2-uvy0)*(y-y0)/(y2-y0)) * 256) << 1);
-            ptro = data + ((uint8_t(w0*uvx0 + w1*uvx1 + w2*uvx2) + uint8_t(w0*uvy0 + w1*uvy1 + w2*uvy2) * 256) << 1);
+            ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
             ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
             memcpy(ptrs, ptro, 2);
@@ -130,14 +127,11 @@ void pushImageTriangleToCanvas(int32_t x0,int32_t y0, int32_t x1,int32_t y1, int
 
         for (x = a; x < b + 1; x++)
         {
-            
-            w0 = ((y1 - y2) * (x - x2) + (x2 - x1) * (y - y2)) / S;
-            w1 = ((y2 - y0) * (x - x2) + (x0 - x2) * (y - y2)) / S;
+            w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
+            w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
             w2 = 1 - w0 - w1;
-            // ptro = data + ((x + y * 256) << 1);
-            // if (a==b) break;
-            // ptro = data + ((uint8_t((uvx2-uvx0)*(x-minX)/(dX)) + uint8_t((uvy2-uvy0)*(y-y0)/(y2-y0)) * 256) << 1);
-            ptro = data + ((uint8_t(w0*uvx0 + w1*uvx1 + w2*uvx2) + uint8_t(w0*uvy0 + w1*uvy1 + w2*uvy2) * 256) << 1);
+            
+            ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
             ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
             memcpy(ptrs, ptro, 2);
