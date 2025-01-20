@@ -2,6 +2,18 @@
 
 ///////////////////* my extra (for TFT_eSPI (ripped of TFT_eSPI) ) /////////////
 
+uint16_t alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
+{
+  // Split out and blend 5-bit red and blue channels
+  uint32_t rxb = bgc & 0xF81F;
+  rxb += ((fgc & 0xF81F) - rxb) * (alpha >> 2) >> 6;
+  // Split out and blend 6-bit green channel
+  uint32_t xgx = bgc & 0x07E0;
+  xgx += ((fgc & 0x07E0) - xgx) * alpha >> 8;
+  // Recombine channels
+  return (rxb & 0xF81F) | (xgx & 0x07E0);
+}
+
 void  pushImageLine(int32_t x, int32_t y, int32_t w, uint16_t *_img, uint8_t *data)
 {
 
@@ -20,13 +32,15 @@ void  pushImageLine(int32_t x, int32_t y, int32_t w, uint16_t *_img, uint8_t *da
 
 void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int16_t x2,int16_t y2, \
                                uint8_t uvx0,uint8_t uvy0, uint8_t uvx1,uint8_t uvy1, uint8_t uvx2,uint8_t uvy2, \
-                               uint16_t* _img, uint8_t* data)
+                               uint8_t light, uint16_t* _img, uint8_t* data)
 {
     if (data == nullptr) return;  
     
     int16_t a, b, y, x, last, S;
     uint8_t w0, w1, w2;
     uint8_t *ptro, *ptrs;
+
+    uint16_t color;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
     if (y0 > y1) {
@@ -102,10 +116,23 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
             w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
             w2 = 255 - w0 - w1;
             
-            ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
-            ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+            if (light == 255)
+            {
+                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+                ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
-            memcpy(ptrs, ptro, 2);
+                memcpy(ptrs, ptro, 2);
+            }
+            else
+            {
+                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+                color = ptro[0]<<8 | ptro[1];
+                
+                color = alphaBlend(light, color, TFT_BLUE);
+
+                color = (color >> 8) | (color << 8);
+                _img[(x + y * SCRN_WIDTH)] = color;
+            }
         }
         
     }
@@ -131,10 +158,23 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
             w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
             w2 = 1 - w0 - w1;
             
-            ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
-            ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+            if (light == 255)
+            {
+                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+                ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
-            memcpy(ptrs, ptro, 2);
+                memcpy(ptrs, ptro, 2);
+            }
+            else
+            {
+                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+                color = ptro[0]<<8 | ptro[1];
+                
+                color = alphaBlend(light, color, TFT_BLUE);
+
+                color = (color >> 8) | (color << 8);
+                _img[(x + y * SCRN_WIDTH)] = color;
+            }
         }
 
     }
@@ -169,8 +209,7 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 if (normal.z < 0) continue;
 
                 uint16_t color = TFT_WHITE;
-                float shade = normal.ScalarProd(lightDirection)/3+0.5; //todo optimize to unitvector
-                color = canvas[cnvsNum].alphaBlend(shade*255, color, TFT_CYAN);
+                float shade = normal.ScalarProd(lightDirection)/2+0.5; //todo optimize to unitvector
                 
                 // canvas[cnvsNum].pushImage
                 // canvas[cnvsNum].fillTriangle
@@ -186,6 +225,7 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                     entities[ent]->polygons[i].uv[0][0],entities[ent]->polygons[i].uv[0][1],
                     entities[ent]->polygons[i].uv[1][0],entities[ent]->polygons[i].uv[1][1],
                     entities[ent]->polygons[i].uv[2][0],entities[ent]->polygons[i].uv[2][1],
+                    uint8_t(shade*255),
                     cnvsPtr[cnvsNum],
                     entities[ent]->texture
                 );
