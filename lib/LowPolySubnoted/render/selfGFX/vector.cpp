@@ -164,15 +164,9 @@ void Vector::Equals(float x, float y)
     this->y = y;
 }
 
-void Vector::toOneVector()
+void Vector::Normalize()
 {
-    float m = 1;
-    if (abs(this->x) > m)
-        m = abs(this->x);
-    if (abs(this->y) > m)
-        m = abs(this->y);
-    if (abs(this->z) > m)
-        m = abs(this->z);
+    float m = this->L();
         
     this->x = this->x/m;
     this->y = this->y/m;
@@ -182,8 +176,8 @@ void Vector::toOneVector()
 float Vector::ScalarProd(Vector v)
 {
     Vector v0 = Vector(*this);
-    v0.toOneVector();
-    v.toOneVector();
+    v0.Normalize();
+    v.Normalize();
     return (v0.x*v.x + v0.y*v.y + v0.z*v.z);
 }
 

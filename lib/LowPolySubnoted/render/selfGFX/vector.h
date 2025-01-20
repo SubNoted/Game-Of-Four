@@ -43,7 +43,7 @@ class Vector
         Equals(float x, float y, float z),
         Equals(float x, float y);
 
-    void toOneVector();
+    void Normalize();
 
     float ScalarProd(Vector v);
 
