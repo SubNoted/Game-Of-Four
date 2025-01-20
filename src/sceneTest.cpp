@@ -13,7 +13,7 @@ float normalSin(float x)//from 0 to 1 on PI //todo to physics engine
 }
 
 Entity cube;
-float size = 100, x = CENTR_X, y = CENTR_Y + 50;
+float size = 150, x = CENTR_X, y = CENTR_Y + 50;
 float input_x = 0, input_y = 0;
 
 void Tscene::update(uint32_t deltaTime) 
