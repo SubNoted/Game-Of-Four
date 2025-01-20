@@ -128,7 +128,7 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
                 ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
                 color = ptro[0]<<8 | ptro[1];
                 
-                color = alphaBlend(light, color, TFT_BLUE);
+                color = alphaBlend(light, color, TFT_DARKCYAN);
 
                 color = (color >> 8) | (color << 8);
                 _img[(x + y * SCRN_WIDTH)] = color;
@@ -170,7 +170,7 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
                 ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
                 color = ptro[0]<<8 | ptro[1];
                 
-                color = alphaBlend(light, color, TFT_BLUE);
+                color = alphaBlend(light, color, TFT_DARKCYAN);
 
                 color = (color >> 8) | (color << 8);
                 _img[(x + y * SCRN_WIDTH)] = color;
