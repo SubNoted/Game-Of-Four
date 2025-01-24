@@ -69,57 +69,95 @@ void Entity::init(std::vector<Entity*>& entities)
 }
 
 
-void Entity::createCube(Vector o, Vector size)
+void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vSize, const uint16_t f[][10], const uint16_t &fSize, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t &texSize)
 {
-    //todo deinit if exists
-    this->O.Equals(o); 
-    this->Size.Equals(size);
-    this->Update = true;
-    this->vertSize = 8;
-    this->polySize = 12;
-    this->vertices = new Vector[vertSize];
-    this->polygons = new Polygon[polySize];
+    this->vertSize = vSize;
+    this->polySize = fSize;
 
-//          4----------5         
-//        /          / |        
-//     /          /    |         
-//   0----------1      |         
-//   |      7   |      6      
-//   |          |    /           
-//   |          | /          
-//   3----------2     
-
-
-    vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
-    vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
-    vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
-    vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
-
-    vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
-    vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
-    vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
-    vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
-
-
-    for (int i = 0; i < 4; i++)
+    this->vertices = new Vector[this->vertSize];
+    this->textureCoords = new Vector2[this->vertSize];
+    this->normals = new Vector[this->vertSize];
+    for (int i = 0; i < this->vertSize; i++)
     {
-        polygons[i*2] = (Polygon(i, 4 + (i + 1) % 4, (i+1)%4));//todo setVert
-        polygons[i*2].setUV(0, 0, 255, 255, 255, 0);
-        polygons[i*2 + 1] = (Polygon(i, 4 + i, 4 + (i + 1) % 4));
-        polygons[i*2 + 1].setUV(0, 0, 0, 255, 255, 255);
+        this->vertices[i] = v[i];
+        this->textureCoords[i] = vt[i];
+        this->normals[i] = vn[i];
+    }
+    
+
+    this->polygons = new Polygon[this->polySize];
+    for (int i = 0; i < this->polySize; i++)
+    {
+        this->polygons[i] = Polygon(f[i][0], f[i][1], f[i][2], f[i][3], f[i][4], f[i][5], f[i][6], f[i][7], f[i][8], f[i][9]);
     }
 
-    //0-1-2-3
-    polygons[8] = (Polygon(0, 1, 2));
-    polygons[8].setUV(0, 255, 255, 255, 255, 0);
-    polygons[9] = (Polygon(0, 2, 3));
-    polygons[9].setUV(0, 255, 255, 0, 0, 0);
+    this->textureSize = texSize;
 
-    //4-5-6-7
-    polygons[10] = (Polygon(4, 6, 5));
-    polygons[10].setUV(0, 255, 255, 255, 255, 0);//todo fix mapping
-    polygons[11] = (Polygon(4, 7, 6));
-    polygons[11].setUV(0, 255, 255, 0, 0, 0);//todo fix mapping
+    this->textureMeta = new uint8_t*[this->textureSize];
+    this->textureWidth = new uint8_t[this->textureSize];
+    this->textureHeight = new uint8_t[this->textureSize];
+    for (int i = 0; i < this->textureSize; i++)
+    {
+        this->textureMeta[i] = texMeta[i];
+        this->textureWidth[i] = tex_w[i];
+        this->textureHeight[i] = tex_h[i];
+    }
+    
+    Size.Equals(Vector(10, 10, 10));
+    O.Equals(Vector(100, 100, 50));
+}
+
+void Entity::createCube(Vector o, Vector size)
+{
+//     //todo deinit if exists
+//     this->O.Equals(o); 
+//     this->Size.Equals(size);
+//     this->Update = true;
+//     this->vertSize = 8;
+//     this->polySize = 12;
+//     this->vertices = new Vector[vertSize];
+//     this->polygons = new Polygon[polySize];
+
+// //          4----------5         
+// //        /          / |        
+// //     /          /    |         
+// //   0----------1      |         
+// //   |      7   |      6      
+// //   |          |    /           
+// //   |          | /          
+// //   3----------2     
+
+
+//     vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
+//     vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
+//     vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
+//     vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
+
+//     vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
+//     vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
+//     vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
+//     vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
+
+
+//     for (int i = 0; i < 4; i++)
+//     {
+//         polygons[i*2] = (SimplePolygon(i, 4 + (i + 1) % 4, (i+1)%4));//todo setVert
+//         polygons[i*2].setUV(0, 0, 255, 255, 255, 0);
+//         polygons[i*2 + 1] = (SimplePolygon(i, 4 + i, 4 + (i + 1) % 4));
+//         polygons[i*2 + 1].setUV(0, 0, 0, 255, 255, 255);
+//     }
+
+//     //0-1-2-3
+//     polygons[8] = (SimplePolygon(0, 1, 2));
+//     polygons[8].setUV(0, 255, 255, 255, 255, 0);
+//     polygons[9] = (SimplePolygon(0, 2, 3));
+//     polygons[9].setUV(0, 255, 255, 0, 0, 0);
+
+//     //4-5-6-7
+//     polygons[10] = (SimplePolygon(4, 6, 5));
+//     polygons[10].setUV(0, 255, 255, 255, 255, 0);//todo fix mapping
+//     polygons[11] = (SimplePolygon(4, 7, 6));
+//     polygons[11].setUV(0, 255, 255, 0, 0, 0);//todo fix mapping
 
 }
 

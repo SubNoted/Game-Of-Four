@@ -23,10 +23,18 @@ protected:
     friend class BasicRendererStrategy;
 
     Vector* vertices;
+    Vector2* textureCoords;
+    Vector* normals;
+
     Polygon* polygons;
 
     uint16_t vertSize;
     uint16_t polySize;
+
+    uint8_t **textureMeta;
+    uint8_t *textureHeight, *textureWidth;
+
+    uint8_t textureSize;
 
 private:
 
@@ -66,13 +74,11 @@ public:
     // static uint16_t SCREEN_WIDTH;
     // static uint16_t SCREEN_HEIGHT;
 
-    Vector O;
+    Vector O = Vector();
     Vector Size;
     Vector Angle;
 
     //Texture
-    uint8_t* texture;
-    uint8_t textureHeight, textureWidth;
 
     uint16_t Color; //for WO texture
 
@@ -95,6 +101,8 @@ public:
 
     void createCube(Vector o, Vector size);
 
+    void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vSize, const uint16_t f[][10], const uint16_t &fSize, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t &texSize);
+    
     //set
     void setPosition(Vector v);
     void setSize(Vector v);
