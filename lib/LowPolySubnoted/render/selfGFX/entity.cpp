@@ -54,12 +54,23 @@ void Entity::processPhysics(float &t)
 
 Entity::Entity()
 {
-    
+    this->O = Vector(0, 0, 0);
+    this->V = Vector(0, 0, 0);
+    this->Size = 1;
+    this->Angle = Vector(0, 0, 0);
+    this->Color = 0;
+    this->Update = false;
 }
 
 Entity::Entity(std::vector<Entity*>& entities)
 {
     init(entities);
+    this->O = Vector(0, 0, 0);
+    this->V = Vector(0, 0, 0);
+    this->Size = 1;
+    this->Angle = Vector(0, 0, 0);
+    this->Color = 0;
+    this->Update = false;
 }
 
 
@@ -102,9 +113,6 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
         this->textureWidth[i] = tex_w[i];
         this->textureHeight[i] = tex_h[i];
     }
-    
-    Size.Equals(Vector(10, 10, 10));
-    O.Equals(Vector(100, 100, 50));
 }
 
 void Entity::createCube(Vector o, Vector size)
@@ -164,15 +172,15 @@ void Entity::createCube(Vector o, Vector size)
 
 void Entity::setCube()
 {
-    vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
-    vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
-    vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
-    vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
+    // vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//0
+    // vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2));//1
+    // vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//2
+    // vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2));//3
 
-    vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
-    vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
-    vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
-    vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
+    // vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//4
+    // vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2));//5
+    // vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//6
+    // vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2));//7
 
 }
 
@@ -187,28 +195,19 @@ Vector Entity::getPosition()
 {
     return this->O;
 }
-void Entity::setSize(Vector v)
-{
-    if (v.isEqual(Size))
-        return;
-    this->Size.Equals(v);
-    Update = true;
-}
-Vector Entity::getSize()
-{
-    return this->Size;
-}
+
 void Entity::setRotation(Vector v)
 {    
-    vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
-    vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
-    vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
-    vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
+    //todo fix
+    // vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
+    // vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
+    // vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
+    // vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
 
-    vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
-    vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
-    vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
-    vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
+    // vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
+    // vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
+    // vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
+    // vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
 }
 void Entity::rotate(Vector v)
 {
@@ -395,25 +394,6 @@ uint16_t Entity::getColor()
 //         sprite->fillTriangle(p[4].x, p[4].y, p[7].x, p[7].y, p[6].x, p[6].y, col);
 //     }
 // }
-
-void Entity::drawCube()
-{
-    drawCube(Size.x);
-}
-void Entity::drawCube(float a)
-{
-    this->Size.x = a;
-    this->Size.y = a;
-    this->Size.z = a;
-    drawParallelepiped();
-}
-void Entity::drawParallelepiped(Vector v)
-{
-    this->Size.x = v.x;
-    this->Size.y = v.y;
-    this->Size.z = v.z;
-    drawParallelepiped();
-}
 
 // void Entity::drawParallelepiped()
 // {
