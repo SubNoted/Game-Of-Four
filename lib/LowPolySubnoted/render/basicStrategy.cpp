@@ -14,18 +14,18 @@ uint16_t alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
   return (rxb & 0xF81F) | (xgx & 0x07E0);
 }
 
-void  pushImageLine(int32_t x, int32_t y, int32_t w, uint16_t *_img, uint8_t *data)
+void pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint8_t *data)
 {
 
     // Pointer within original image
-    uint8_t *ptro = data + ((x + y * 256) << 1);
+    uint8_t *ptro = data + ((x + y * 64) << 1);
     // Pointer within sprite image
     uint8_t *ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
 
-    // while (h--)
+    while (h--)
     {
         memcpy(ptrs, ptro, (w<<1));
-        ptro += 256<<1;
+        ptro += 64<<1;
         ptrs += SCRN_WIDTH<<1;
     }
 }
@@ -189,20 +189,23 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
     for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {
         Debug::renderTime = micros();
-        canvas[cnvsNum].fillScreen(TFT_CYAN);
+        canvas[cnvsNum].fillScreen(TFT_SKYBLUE);
 
         //actual rendering
         for (uint8_t ent = 0; ent < entities.size(); ent++) //entities
         {
-            for (uint8_t i = 0; i < entities[ent]->polySize; i++) //polygons
+            for (uint16_t i = 0; i < entities[ent]->polySize; i++) //polygons
             {
-                Vector verts[3] = { entities[ent]->vertices[entities[ent]->polygons[i].vertices[0]], 
-                                    entities[ent]->vertices[entities[ent]->polygons[i].vertices[1]], 
-                                    entities[ent]->vertices[entities[ent]->polygons[i].vertices[2]]};
-                
-                verts[0].toFOV_XY(FOV);
-                verts[1].toFOV_XY(FOV);
-                verts[2].toFOV_XY(FOV);
+                Vector verts[3] = { entities[ent]->vertices[entities[ent]->polygons[i].v[0]], 
+                                    entities[ent]->vertices[entities[ent]->polygons[i].v[1]], 
+                                    entities[ent]->vertices[entities[ent]->polygons[i].v[2]]};
+                for (uint8_t j = 0; j < 3; j++)
+                {
+                    verts[j].x = verts[j].x * entities[ent]->Size.x + entities[ent]->O.x;
+                    verts[j].y = verts[j].y * entities[ent]->Size.y + entities[ent]->O.y;
+                    verts[j].z = verts[j].z * entities[ent]->Size.z + entities[ent]->O.z;
+                    verts[j].toFOV_XY(FOV);
+                }
                 
                 Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
                 
@@ -214,21 +217,21 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 // canvas[cnvsNum].pushImage
                 // canvas[cnvsNum].fillTriangle
 
-                // pushImage(100,100, 100, 100, cnvsPtr[cnvsNum], cloudsTex);
+                // pushImage(0,0, 64, 32, cnvsPtr[cnvsNum], blazeTex);
 
-                // canvas[cnvsNum].pushImage(0,0, 256, 256, cloudsTex);
+                // canvas[cnvsNum].pushImage(0,0, 64, 32, blazeTex);
 
-                pushImageTriangleToCanvas(
-                    verts[0].x, verts[0].y,
-                    verts[1].x, verts[1].y,
-                    verts[2].x, verts[2].y,
-                    entities[ent]->polygons[i].uv[0][0],entities[ent]->polygons[i].uv[0][1],
-                    entities[ent]->polygons[i].uv[1][0],entities[ent]->polygons[i].uv[1][1],
-                    entities[ent]->polygons[i].uv[2][0],entities[ent]->polygons[i].uv[2][1],
-                    uint8_t(shade*255),
-                    cnvsPtr[cnvsNum],
-                    entities[ent]->texture
-                );
+                // pushImageTriangleToCanvas(
+                //     verts[0].x, verts[0].y,
+                //     verts[1].x, verts[1].y,
+                //     verts[2].x, verts[2].y,
+                //     entities[ent]->polygons[i].uv[0][0],entities[ent]->polygons[i].uv[0][1],
+                //     entities[ent]->polygons[i].uv[1][0],entities[ent]->polygons[i].uv[1][1],
+                //     entities[ent]->polygons[i].uv[2][0],entities[ent]->polygons[i].uv[2][1],
+                //     uint8_t(shade*255),
+                //     cnvsPtr[cnvsNum],
+                //     entities[ent]->texture
+                // );
 #if DEBUG_MODE
                 canvas[cnvsNum].drawTriangle(
                     verts[0].x, verts[0].y,
@@ -236,6 +239,11 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                     verts[2].x, verts[2].y,
                     TFT_DARKGREY
                 );
+
+                // canvas[cnvsNum].drawCircle(
+                //     verts[0].x, verts[0].y, 10,
+                //     TFT_RED
+                // );
 #endif
 
             }
