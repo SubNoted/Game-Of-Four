@@ -28,13 +28,13 @@ protected:
 
     Polygon* polygons;
 
-    uint16_t vertSize;
-    uint16_t polySize;
+    uint16_t vertLength;
+    uint16_t polyLength;
 
     uint8_t **textureMeta;
-    uint8_t *textureHeight, *textureWidth;
+    uint8_t *textureHeight, *textureWidth, *textureLength;
 
-    uint8_t textureSize;
+    uint8_t texturesLength;
 
 private:
 
@@ -75,7 +75,7 @@ public:
     // static uint16_t SCREEN_HEIGHT;
 
     Vector O = Vector();
-    Vector Size;
+    float Size = 1;
     Vector Angle;
 
     //Texture
@@ -101,7 +101,7 @@ public:
 
     void createCube(Vector o, Vector size);
 
-    void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vSize, const uint16_t f[][10], const uint16_t &fSize, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t &texSize);
+    void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t vLength, const uint16_t f[][10], const uint16_t fLength, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t texLength);
     
     //set
     void setPosition(Vector v);

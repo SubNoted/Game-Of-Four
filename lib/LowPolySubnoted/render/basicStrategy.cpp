@@ -194,19 +194,23 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
         //actual rendering
         for (uint8_t ent = 0; ent < entities.size(); ent++) //entities
         {
-            for (uint16_t i = 0; i < entities[ent]->polySize; i++) //polygons
+            for (uint16_t i = 0; i < entities[ent]->polyLength; i++) //polygons
             {
                 Vector verts[3] = { entities[ent]->vertices[entities[ent]->polygons[i].v[0]], 
                                     entities[ent]->vertices[entities[ent]->polygons[i].v[1]], 
                                     entities[ent]->vertices[entities[ent]->polygons[i].v[2]]};
                 for (uint8_t j = 0; j < 3; j++)
                 {
-                    verts[j].x = verts[j].x * entities[ent]->Size.x + entities[ent]->O.x;
-                    verts[j].y = verts[j].y * entities[ent]->Size.y + entities[ent]->O.y;
-                    verts[j].z = verts[j].z * entities[ent]->Size.z + entities[ent]->O.z;
+                    verts[j].Multiply(entities[ent]->Size);
+                    verts[j].Plus(entities[ent]->O);
+
                     verts[j].toFOV_XY(FOV);
                 }
                 
+                
+                // w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
+                // w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
+                // w2 = 255 - w0 - w1;
                 Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
                 
                 if (normal.z < 0) continue;

@@ -80,15 +80,15 @@ void Entity::init(std::vector<Entity*>& entities)
 }
 
 
-void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vSize, const uint16_t f[][10], const uint16_t &fSize, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t &texSize)
+void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t vLength, const uint16_t f[][10], const uint16_t fLength, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t texLength)
 {
-    this->vertSize = vSize;
-    this->polySize = fSize;
+    this->vertLength = vLength;
+    this->polyLength = fLength;
 
-    this->vertices = new Vector[this->vertSize];
-    this->textureCoords = new Vector2[this->vertSize];
-    this->normals = new Vector[this->vertSize];
-    for (int i = 0; i < this->vertSize; i++)
+    this->vertices = new Vector[this->vertLength];
+    this->textureCoords = new Vector2[this->vertLength];
+    this->normals = new Vector[this->vertLength];
+    for (int i = 0; i < this->vertLength; i++)
     {
         this->vertices[i] = v[i];
         this->textureCoords[i] = vt[i];
@@ -96,18 +96,18 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
     }
     
 
-    this->polygons = new Polygon[this->polySize];
-    for (int i = 0; i < this->polySize; i++)
+    this->polygons = new Polygon[this->polyLength];
+    for (int i = 0; i < this->polyLength; i++)
     {
         this->polygons[i] = Polygon(f[i][0], f[i][1], f[i][2], f[i][3], f[i][4], f[i][5], f[i][6], f[i][7], f[i][8], f[i][9]);
     }
 
-    this->textureSize = texSize;
+    this->texturesLength = texLength;
 
-    this->textureMeta = new uint8_t*[this->textureSize];
-    this->textureWidth = new uint8_t[this->textureSize];
-    this->textureHeight = new uint8_t[this->textureSize];
-    for (int i = 0; i < this->textureSize; i++)
+    this->textureMeta = new uint8_t*[this->texturesLength];
+    this->textureWidth = new uint8_t[this->texturesLength];
+    this->textureHeight = new uint8_t[this->texturesLength];
+    for (int i = 0; i < this->texturesLength; i++)
     {
         this->textureMeta[i] = texMeta[i];
         this->textureWidth[i] = tex_w[i];
@@ -216,9 +216,9 @@ void Entity::rotate(Vector v)
     // this->Angle.Equals(v);
     // Update = true;
 
-    for (int i = 0; i < vertSize; i++)
+    for (int i = 0; i < vertLength; i++)
     {
-        vertices[i].Rotate(v, O);
+        vertices[i].Rotate(v);
     }
 }
 Vector Entity::getAngle()

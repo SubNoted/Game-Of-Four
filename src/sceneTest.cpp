@@ -33,8 +33,8 @@ void Tscene::update(uint32_t deltaTime)
     input_y = (float)(map(analogRead(4), 695, 3000, 0, 1000)-500)/1000;
 #endif
 
-    // if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
-    //     cube.rotate(Vector(0,-0.005*deltaTime*input_x,-0.005*deltaTime*input_y));
+    if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
+        cube.rotate(Vector(0,-0.005*deltaTime*input_x,-0.005*deltaTime*input_y));
 
 
     // cube.setRotation(Vector(0.002*millis(),0,y));
@@ -44,6 +44,8 @@ void Tscene::enter() {
 
     cube.init(entities);
     cube.createModel(blazeModel_PARAMETRS);
+    cube.Size = 20;
+    cube.O.Equals(100,150,60);
     // cube.createCube(Vector(x, y, 100), Vector(size));
 
     //texture
