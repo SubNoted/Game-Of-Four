@@ -4,14 +4,21 @@
 
 uint16_t alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
 {
-  // Split out and blend 5-bit red and blue channels
-  uint32_t rxb = bgc & 0xF81F;
-  rxb += ((fgc & 0xF81F) - rxb) * (alpha >> 2) >> 6;
-  // Split out and blend 6-bit green channel
-  uint32_t xgx = bgc & 0x07E0;
-  xgx += ((fgc & 0x07E0) - xgx) * alpha >> 8;
-  // Recombine channels
-  return (rxb & 0xF81F) | (xgx & 0x07E0);
+    // Split out and blend 5-bit red and blue channels
+    uint32_t rxb = bgc & 0xF81F;
+    rxb += ((fgc & 0xF81F) - rxb) * (alpha >> 2) >> 6;
+    // Split out and blend 6-bit green channel
+    uint32_t xgx = bgc & 0x07E0;
+    xgx += ((fgc & 0x07E0) - xgx) * alpha >> 8;
+    // Recombine channels
+    return (rxb & 0xF81F) | (xgx & 0x07E0);
+}
+
+inline void drawTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, TFT_eSprite &canvas, uint16_t color)
+{
+    canvas.drawLine(x0, y0, x1, y1, color);
+    canvas.drawLine(x1, y1, x2, y2, color);
+    canvas.drawLine(x2, y2, x0, y0, color);
 }
 
 void pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint8_t *data)
@@ -186,40 +193,55 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
 {
     Debug::prerenderTimeSum += micros() - Debug::prerenderTime;
 
-    for (int cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
+    for (uint8_t cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {
         Debug::renderTime = micros();
         canvas[cnvsNum].fillScreen(TFT_SKYBLUE);
 
         //actual rendering
-        for (uint8_t ent = 0; ent < entities.size(); ent++) //entities
+        for (uint8_t entityNum = 0; entityNum < entities.size(); entityNum++) //entities
         {
-            for (uint16_t i = 0; i < entities[ent]->polyLength; i++) //polygons
+            Entity* entity = entities[entityNum];
+            for (uint16_t i = 0; i < entities[entityNum]->polyLength; i++) //polygons
             {
-                Vector verts[3] = { entities[ent]->vertices[entities[ent]->polygons[i].v[0]], 
-                                    entities[ent]->vertices[entities[ent]->polygons[i].v[1]], 
-                                    entities[ent]->vertices[entities[ent]->polygons[i].v[2]]};
-                for (uint8_t j = 0; j < 3; j++)
-                {
-                    verts[j].Multiply(entities[ent]->Size);
-                    verts[j].Plus(entities[ent]->O);
+                Polygon polygon = entity->polygons[i];
+                Vector verts[3] = { entity->vertices[polygon.v[0]], 
+                                    entity->vertices[polygon.v[1]], 
+                                    entity->vertices[polygon.v[2]]};
 
-                    verts[j].toFOV_XY(FOV);
-                }
+                float s = entity->Size;
+                Vector o = entity->O;
+                
+                verts[0].x = verts[0].x*s + o.x;
+                verts[0].y = verts[0].y*s + o.y;
+                verts[0].z = verts[0].z*s + o.z;
+                verts[1].x = verts[1].x*s + o.x;
+                verts[1].y = verts[1].y*s + o.y;
+                verts[1].z = verts[1].z*s + o.z;
+                verts[2].x = verts[2].x*s + o.x;
+                verts[2].y = verts[2].y*s + o.y;
+                verts[2].z = verts[2].z*s + o.z;
+
+                // verts[j].toFOV_XY(FOV);
                 
                 
                 // w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
                 // w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
                 // w2 = 255 - w0 - w1;
-                Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
+                // Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
                 
-                if (normal.z < 0) continue;
+                // // if (normal.z < 0) continue;
 
-                uint16_t color = TFT_WHITE;
-                float shade = normal.ScalarProd(lightDirection)/2+0.5; //todo optimize to unitvector
+                // uint16_t color = TFT_WHITE;
+                // float shade = normal.ScalarProd(lightDirection)/2+0.5; //todo optimize to unitvector
                 
                 // canvas[cnvsNum].pushImage
-                // canvas[cnvsNum].fillTriangle
+                // canvas[cnvsNum].fillTriangle(
+                //     verts[0].x, verts[0].y,
+                //     verts[1].x, verts[1].y,
+                //     verts[2].x, verts[2].y,
+                //     color
+                // );
 
                 // pushImage(0,0, 64, 32, cnvsPtr[cnvsNum], blazeTex);
 
@@ -229,23 +251,31 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 //     verts[0].x, verts[0].y,
                 //     verts[1].x, verts[1].y,
                 //     verts[2].x, verts[2].y,
-                //     entities[ent]->polygons[i].uv[0][0],entities[ent]->polygons[i].uv[0][1],
-                //     entities[ent]->polygons[i].uv[1][0],entities[ent]->polygons[i].uv[1][1],
-                //     entities[ent]->polygons[i].uv[2][0],entities[ent]->polygons[i].uv[2][1],
+                //     entities[entityNum]->polygons[polyNum].uv[0][0],entities[entityNum]->polygons[polyNum].uv[0][1],
+                //     entities[entityNum]->polygons[polyNum].uv[1][0],entities[entityNum]->polygons[polyNum].uv[1][1],
+                //     entities[entityNum]->polygons[polyNum].uv[2][0],entities[entityNum]->polygons[polyNum].uv[2][1],
                 //     uint8_t(shade*255),
                 //     cnvsPtr[cnvsNum],
-                //     entities[ent]->texture
+                //     entities[entityNum]->texture
                 // );
 #if DEBUG_MODE
-                canvas[cnvsNum].drawTriangle(
+                // canvas[cnvsNum].drawTriangle(
+                //     verts[0].x, verts[0].y,
+                //     verts[1].x, verts[1].y,
+                //     verts[2].x, verts[2].y,
+                //     TFT_DARKGREY
+                // );
+                drawTriangle(
                     verts[0].x, verts[0].y,
                     verts[1].x, verts[1].y,
                     verts[2].x, verts[2].y,
+                    canvas[cnvsNum],
                     TFT_DARKGREY
                 );
 
+                // log_d("0: %f %f %f", entities[entityNum]->O.x, entities[entityNum]->O.y, entities[entityNum]->O.z);
                 // canvas[cnvsNum].drawCircle(
-                //     verts[0].x, verts[0].y, 10,
+                //     entities[entityNum]->O.x, entities[entityNum]->O.y, 10,
                 //     TFT_RED
                 // );
 #endif

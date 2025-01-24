@@ -26,22 +26,22 @@ class Vector
     Vector Delta(Vector s);
     Vector Delta(float x, float y);
 
-    void Plus(Vector v),
-        Plus(float x, float y, float z),
-        Plus(float x, float y);
+    void Plus(const Vector &v),
+        Plus(const float &x, const float &y, const float &z),
+        Plus(const float &x, const float &y);
 
-    void Minus(Vector v),
-        Minus(float x, float y, float z),
-        Minus(float x, float y);
+    void Minus(const Vector &v),
+        Minus(const float &x, const float &y, const float &z),
+        Minus(const float &x, const float &y);
 
-    void Multiply(Vector v),
-        Multiply(float x, float y, float z),
-        Multiply(float x, float y),
-        Multiply(float a);
+    void Multiply(const Vector &v),
+        Multiply(const float &x, const float &y, const float &z),
+        Multiply(const float &x, const float &y),
+        Multiply(const float &a);
 
-    void Equals(Vector v),
-        Equals(float x, float y, float z),
-        Equals(float x, float y);
+    void Equals(const Vector &v),
+        Equals(const float &x, const float &y, const float &z),
+        Equals(const float &x, const float &y);
 
     void Normalize();
 

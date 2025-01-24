@@ -85,80 +85,80 @@ Vector Vector::Delta(float x, float y)
     return Vector((this->x-x), (this->y-y), this->z);
 }
 
-void Vector::Plus(Vector v)
+void Vector::Plus(const Vector &v)
 {
     this->x += v.x;
     this->y += v.y;
     this->z += v.z;
 }
-void Vector::Plus(float x, float y, float z)
+void Vector::Plus(const float &x, const float &y, const float &z)
 {
     this->x += x;
     this->y += y;
     this->z += z;
 }
-void Vector::Plus(float x, float y)
+void Vector::Plus(const float &x, const float &y)
 {
     this->x += x;
     this->y += y;
 }
 
-void Vector::Minus(Vector v)
+void Vector::Minus(const Vector &v)
 {
     this->x -= v.x;
     this->y -= v.y;
     this->z -= v.z;
 }
-void Vector::Minus(float x, float y, float z)
+void Vector::Minus(const float &x, const float &y, const float &z)
 {
     this->x -= x;
     this->y -= y;
     this->z -= z;
 }
-void Vector::Minus(float x, float y)
+void Vector::Minus(const float &x, const float &y)
 {
     this->x -= x;
     this->y -= y;
 }
 
-void Vector::Multiply(Vector v)
+void Vector::Multiply(const Vector &v)
 {
     this->x *= v.x;
     this->y *= v.y;
     this->z *= v.z;
 }
-void Vector::Multiply(float x, float y, float z)
+void Vector::Multiply(const float &x, const float &y, const float &z)
 {
     this->x *= x;
     this->y *= y;
     this->z *= z;
 }
-void Vector::Multiply(float x, float y)
+void Vector::Multiply(const float &x, const float &y)
 {
     this->x *= x;
     this->y *= y;
 }
 
-void Vector::Multiply(float a)
+void Vector::Multiply(const float &a)
 {
     this->x *= a;
     this->y *= a;
     this->z *= a;
 }
 
-void Vector::Equals(Vector v)
+void Vector::Equals(const Vector& v)
 {
     this->x = v.x;
     this->y = v.y;
     this->z = v.z;
 }
-void Vector::Equals(float x, float y, float z)
+void Vector::Equals(const float &x, const float &y, const float &z)
 {
     this->x = x;
     this->y = y;
     this->z = z;
 }
-void Vector::Equals(float x, float y)
+void Vector::Equals(const float &x, const float &y)
 {
     this->x = x;
     this->y = y;
