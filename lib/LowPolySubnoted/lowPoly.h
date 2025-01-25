@@ -22,14 +22,4 @@
 #include "scene/sceneManager.h"
 
 
-
-class LowPoly
-{
-public:
-
-    void init();
-};
-
-
-
 #endif

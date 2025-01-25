@@ -15,7 +15,7 @@ public:
 
     // static void init();
     
-    void initRenderer();
+    void init();
 
     void changeScene(std::shared_ptr<Scene> newScene);
     void render();

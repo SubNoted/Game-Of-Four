@@ -11,8 +11,6 @@
 
 // #include "cloudsTex.h"
 
-
-LowPoly lowPoly;
 SceneManager sceneManager;
 
 
@@ -44,8 +42,7 @@ log_d("flash size %d", size_flash_chip);
 
     randomSeed(analogRead(12));
 
-	lowPoly.init();
-    sceneManager.initRenderer();
+	sceneManager.init();
     sceneManager.changeScene(std::shared_ptr<Tscene>(new Tscene()));//set test scene
 }
 
