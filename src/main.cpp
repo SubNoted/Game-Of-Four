@@ -47,21 +47,9 @@ log_d("flash size %d", size_flash_chip);
 	lowPoly.init();
     sceneManager.initRenderer();
     sceneManager.changeScene(std::shared_ptr<Tscene>(new Tscene()));//set test scene
-    
-    xTaskCreatePinnedToCore(core0, "Physics", 10000, NULL, tskIDLE_PRIORITY , NULL,  0);
 }
 
 void loop() 
 {
     sceneManager.render(); //current scene render loop
-}
-
-void core0(void * pvParameters){
-    esp_task_wdt_add(nullptr);
-    for (;;) {
-        esp_task_wdt_reset();
-
-
-        sceneManager.update(); //current scene update loop
-    }
 }

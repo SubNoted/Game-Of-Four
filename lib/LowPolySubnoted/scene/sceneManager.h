@@ -15,34 +15,23 @@ public:
 
     // static void init();
     
-    void initRenderer(){
-        renderer.init();
-        renderer.setStrategy(std::unique_ptr<IRendererStrategy>(new BasicRendererStrategy()));
-    };
+    void initRenderer();
 
     void changeScene(std::shared_ptr<Scene> newScene);
-    void update();
     void render();
     void exit();
 
+    std::shared_ptr<Scene> currentScene = nullptr;
 
 private:
 
     GraphicsRenderer renderer;
 
     ////////tools/////////
-    uint32_t last4deltaTime = 0;
-    uint32_t deltaTime = 0;
+    TaskHandle_t updateBufferTaskHandle = NULL;
+    TaskHandle_t updatePhysicsTaskHandle = NULL;
 
 
-#if DEBUG_MODE
-
-    unsigned long statusCheckTime = 0;
-
-#endif // DEBUG_MODE
-
-
-    std::shared_ptr<Scene> currentScene = nullptr;
 };
 
 
