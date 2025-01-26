@@ -21,15 +21,18 @@ protected:
     friend class GraphicsRenderer;
     friend class IRendererStrategy;
     friend class BasicRendererStrategy;
+    
+    Vector2_16* vertices_b; //buffer
 
     Vector* vertices;
-    Vector2* textureCoords;
+    Vector2_u8* textureCoords;
     Vector* normals;
+
 
     Polygon* polygons;
 
-    uint16_t vertLength;
-    uint16_t polyLength;
+    int16_t vertLength = 0;
+    int16_t polyLength = 0;
 
     uint8_t **textureMeta;
     uint8_t *textureHeight, *textureWidth, *textureLength;
@@ -54,7 +57,6 @@ private:
     // bool firstTouched;
 
     Vector2 minp, maxp; //for render
-
 
 
     
@@ -103,6 +105,9 @@ public:
 
     void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t vLength, const uint16_t f[][10], const uint16_t fLength, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t texLength);
     
+    
+    void updateBuffer();
+
     //set
     void setPosition(Vector v);
     void setSize(Vector v);

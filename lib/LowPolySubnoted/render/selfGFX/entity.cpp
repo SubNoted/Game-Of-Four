@@ -86,12 +86,16 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
     this->polyLength = fLength;
 
     this->vertices = new Vector[this->vertLength];
-    this->textureCoords = new Vector2[this->vertLength];
+    this->textureCoords = new Vector2_u8[this->vertLength];
     this->normals = new Vector[this->vertLength];
+
+    this->vertices_b = new Vector2_16[this->vertLength];
+
     for (int i = 0; i < this->vertLength; i++)
     {
         this->vertices[i] = v[i];
-        this->textureCoords[i] = vt[i];
+        this->textureCoords[i].x = vt[i].x*255;
+        this->textureCoords[i].y = vt[i].y*255;
         this->normals[i] = vn[i];
     }
     
@@ -112,6 +116,14 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
         this->textureMeta[i] = texMeta[i];
         this->textureWidth[i] = tex_w[i];
         this->textureHeight[i] = tex_h[i];
+    }
+    updateBuffer();
+}
+void Entity::updateBuffer()
+{
+    for (uint16_t i = 0; i < this->vertLength; i++)
+    {
+        this->vertices_b[i].Equals(this->vertices[i].x*this->Size + O.x, this->vertices[i].y*this->Size + O.y);
     }
 }
 
@@ -216,9 +228,11 @@ void Entity::rotate(Vector v)
     // this->Angle.Equals(v);
     // Update = true;
 
+    this->Angle.Plus(v);
     for (int i = 0; i < vertLength; i++)
     {
         vertices[i].Rotate(v);
+        normals[i].Rotate(v);
     }
 }
 Vector Entity::getAngle()

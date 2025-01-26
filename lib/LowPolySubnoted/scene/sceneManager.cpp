@@ -3,22 +3,21 @@
 
 void updatePhysics(void * pvParameter) 
 {
-#if DEBUG_MODE
-    Debug::physicsCalls++;
-#endif
-    SceneManager* sceneManager = (SceneManager*)pvParameter;
+    Scene* currentScene = (Scene*)pvParameter;
 
     uint32_t deltaTime, last4deltaTime = millis();
-
     for (;;) 
     {
+#if DEBUG_MODE
+        Debug::physicsCalls++;
+#endif
         deltaTime = millis() - last4deltaTime;
         if (deltaTime > 100)
             deltaTime = 100;
         last4deltaTime = millis();
 
-        if (sceneManager->currentScene) {
-            sceneManager->currentScene->update(deltaTime);
+        if (currentScene) {
+            currentScene->update(deltaTime);
         }
         vTaskDelay(1);
     }
@@ -26,12 +25,15 @@ void updatePhysics(void * pvParameter)
 
 void updateBuffer(void * pvParameter) 
 {
-    SceneManager* sceneManager = (SceneManager*)pvParameter;
+    Scene* currentScene = (Scene*)pvParameter;
     for (;;) 
     {
-        for (uint16_t i = 0; i < sceneManager->currentScene->entities.size(); i++) 
+        if (currentScene)
         {
-            // currentScene->entities
+            for (uint16_t i = 0; i < currentScene->entities.size(); i++) //todo test
+            {
+                currentScene->entities[i]->updateBuffer();
+            }
         }
         vTaskDelay(1);
     }   
@@ -90,8 +92,6 @@ void SceneManager::init()
     renderer.init();
     renderer.setStrategy(std::unique_ptr<IRendererStrategy>(new BasicRendererStrategy()));
 
-    xTaskCreatePinnedToCore(updatePhysics, "updatePhysics", 2048, (this), 5, &updatePhysicsTaskHandle, 0);
-    // xTaskCreatePinnedToCore(updateBuffer, "updateBuffer", 2048, (this), 4, &updatePhysicsTaskHandle, 0);
 #if DEBUG_MODE
     xTaskCreatePinnedToCore(log_func, "log_func", 2048, NULL, 5, NULL, 0);
 #endif 
@@ -112,9 +112,13 @@ void SceneManager::changeScene(std::shared_ptr<Scene> newScene) {
     if (updateBufferTaskHandle != NULL)
     {
         vTaskDelete(updateBufferTaskHandle);
+        vTaskDelete(updatePhysicsTaskHandle);
         updateBufferTaskHandle = NULL;
+        updatePhysicsTaskHandle = NULL;
     }
     
+    xTaskCreatePinnedToCore(updateBuffer, "updateBuffer", 2048, (currentScene.get()), 5, &updateBufferTaskHandle, 0);
+    xTaskCreatePinnedToCore(updatePhysics, "updatePhysics", 2048, (currentScene.get()), 5, &updatePhysicsTaskHandle, 0);
 }
 
 
