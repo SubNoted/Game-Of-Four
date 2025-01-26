@@ -61,64 +61,47 @@ class Vector
     static Vector Normal(Vector& a, Vector& b, Vector& c);
 };
 
-class Vector2
+#include <cstdint>  // Include the cstdint library for uint8_t type
+
+class Vector_16
 {
     public:
-    float x, y;
-    Vector2(void);
-    Vector2(Vector v);
-    Vector2(float x, float y);
-    Vector toVector3();
-
-    bool isEqual(Vector2 v),
-        isEqual(Vector2 v, float r);
-
-    bool isExist();
-
-    float L(void),
-        L(Vector2 v),
-        L(float x, float y);
-
-    Vector2 Summ(Vector2 s);
-    Vector2 Summ(Vector s);
-    Vector2 Delta(Vector2 s);
-    Vector2 Delta(Vector s);
-
-    void Plus(Vector2 v),
-        Plus(float x, float y);
-
-    void Minus(Vector2 v),
-        Minus(float x, float y);
-
-    void Multiply(Vector2 v),
-        Multiply(float x, float y);
-
-    void Equals(Vector2 v),
-        Equals(Vector v),
-        Equals(float x, float y);
-
-        
-    void Rotate(float alp);
-    void Round();
-    void Reset();
+    int16_t x = 0, y = 0, z = 0;
+    Vector_16(void)
+    {
+        this->x = 0;
+        this->y = 0;
+        this->z = 0;
+    };
+    Vector_16(int16_t x, int16_t y)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = 0;
+    };
+    Vector_16(int16_t x, int16_t y, int16_t z)
+    {
+        this->x = x;
+        this->y = y;
+        this->z = z;
+    };
 };
-
-#include <cstdint>  // Include the cstdint library for uint8_t type
-class UnitVector
+class Vector_8
 {
 public:
-    uint8_t x, y, z;
-    UnitVector(void);
-    UnitVector(uint8_t x, uint8_t y, uint8_t z);
-    UnitVector(Vector& a, Vector& b, Vector& c);//normal
+    int8_t x, y, z;
+    Vector_8(void);
+    Vector_8(int8_t x, int8_t y, int8_t z);
+    Vector_8(Vector& v);
+    Vector_8(Vector& a, Vector& b, Vector& c);//normal
 
-    bool isEqual(UnitVector v),
+    bool isEqual(Vector_8 v),
         isExist();
 
-    void Equals(UnitVector v),
-        Equals(uint8_t x, uint8_t y, uint8_t z);
+    void Equals(Vector_8 v),
+        Equals(int8_t x, int8_t y, int8_t z);
 
-    uint8_t ScalarProd(UnitVector v);
+    int8_t ScalarProd(Vector_8 v);
 
     void setRotation(Vector alp);
     void Rotate(Vector alp);
@@ -126,22 +109,29 @@ public:
     void Reset();
 };
 
-
-class Bounding2
-{
-    public:
-    bool upper;
-    float k, c;
-
-    Bounding2(void);
-    Bounding2(Vector2 p0, Vector2 p1, Vector2 v);
-
-    Vector2 intersection(Bounding2 b);
-
-    bool isInBounds(Vector2& v);
-    bool isInBounds(float x, float y);
-
-    void Reset();
-};
+// class Vector_u16
+// {
+//     public:
+//     uint16_t x, y, z;
+//     Vector_u16(void);
+//     Vector_u16(uint16_t x, uint16_t y, uint16_t z)
+//     {
+//         this->x = x;
+//         this->y = y;
+//         this->z = z;
+//     };
+// };
+// class Vector_u8
+// {
+//     public:
+//     uint8_t x, y, z;
+//     Vector_u8(void);
+//     Vector_u8(uint8_t x, uint8_t y, uint8_t z)
+//     {
+//         this->x = x;
+//         this->y = y;
+//         this->z = z;
+//     };
+// };
 
 #endif

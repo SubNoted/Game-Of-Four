@@ -1,7 +1,7 @@
 #ifndef _POLYGON_
 #define _POLYGON_
 
-#include "vector.h"
+#include "vector2.h"
 // #include <scene/scene.h>
 #include <vector>
 

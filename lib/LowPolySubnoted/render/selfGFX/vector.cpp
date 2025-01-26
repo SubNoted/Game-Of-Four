@@ -307,163 +307,28 @@ Vector Vector::Normal(Vector& a, Vector& b, Vector& c)
     return Vector(ab.y * ac.z - ab.z * ac.y, ab.z * ac.x - ab.x * ac.z, ab.x * ac.y - ab.y * ac.x);
 }
 
-////////////////////////////////////////////VECTOR2/////////////////////////////////////////////////////
+////////////////////////////////////////////Vector_8/////////////////////////////////////////
 
-Vector2::Vector2(void)
-{
-    x = 0;
-    y = 0;
-}
-Vector2::Vector2(Vector v)
-{
-    this->x = v.x;
-    this->y = v.y;
-}
-Vector2::Vector2(float x, float y)
-{
-    this->x = x;
-    this->y = y;
-}
-Vector Vector2::toVector3()
-{
-    return Vector(this->x, this->y);
-}
-
-bool Vector2::isEqual(Vector2 v)
-{
-    if (this->x == v.x && this->y == v.y)
-        return true;
-    return false;
-}
-
-bool Vector2::isEqual(Vector2 v, float r)
-{
-    if (abs(this->x - v.x) < r && abs(this->y - v.y) < r)
-        return true;
-    return false;
-}
-
-bool Vector2::isExist()
-{
-    if (this->x != 0 || this->y != 0)
-        return true;
-    return false;
-}
-
-float Vector2::L(void)
-{
-    return sqrt(x*x + y*y);
-}
-float Vector2::L(Vector2 v)
-{
-    return sqrt(pow(this->x-v.x, 2) + pow(this->y-v.y, 2));
-}
-float Vector2::L(float x, float y)
-{
-    return sqrt(pow(this->x-x, 2) + pow(this->y-y, 2));
-}
-
-Vector2 Vector2::Summ(Vector2 s)
-{
-    return Vector2(this->x+s.x, this->y+s.y);
-}
-Vector2 Vector2::Summ(Vector s)
-{
-    return Vector2(this->x+s.x, this->y+s.y);
-}
-Vector2 Vector2::Delta(Vector2 s)
-{
-    return Vector2(this->x-s.x, this->y-s.y);
-}
-Vector2 Vector2::Delta(Vector s)
-{
-    return Vector2(this->x-s.x, this->y-s.y);
-}
-
-void Vector2::Plus(Vector2 v)
-{
-    this->x += v.x;
-    this->y += v.y;
-}
-void Vector2::Plus(float x, float y)
-{
-    this->x += x;
-    this->y += y;
-}
-
-void Vector2::Minus(Vector2 v)
-{
-    this->x -= v.x;
-    this->y -= v.y;
-}
-void Vector2::Minus(float x, float y)
-{
-    this->x -= x;
-    this->y -= y;
-}
-
-void Vector2::Multiply(Vector2 v)
-{
-    this->x *= v.x;
-    this->y *= v.y;
-}
-void Vector2::Multiply(float x, float y)
-{
-    this->x *= x;
-    this->y *= y;
-}
-
-void Vector2::Equals(Vector2 v)
-{
-    this->x = v.x;
-    this->y = v.y;
-}
-void Vector2::Equals(Vector v)
-{
-    this->x = v.x;
-    this->y = v.y;
-}
-void Vector2::Equals(float x, float y)
-{
-    this->x = x;
-    this->y = y;
-}
-
-void Vector2::Rotate(float d)
-{
-    this->Equals(
-        this->x * cos(d) - this->y * sin(d),
-        this->x * sin(d) + this->y * cos(d)
-    );
-}
-
-void Vector2::Round()
-{
-    this->x = (int)this->x;
-    this->y = (int)this->y;
-}
-
-void Vector2::Reset()
-{
-    this->x = 0;
-    this->y = 0;
-}
-
-////////////////////////////////////////////UnitVector/////////////////////////////////////////
-
-UnitVector::UnitVector()
-{
-    this->x = 0;
-    this->y = 0;
-    this->z = 0;
-}
-UnitVector::UnitVector(uint8_t x, uint8_t y, uint8_t z)
+Vector_8::Vector_8(int8_t x, int8_t y, int8_t z)
 {
     this->x = x;
     this->y = y;
     this->z = z;
 }
-UnitVector::UnitVector(Vector& a, Vector& b, Vector& c)//normal
+Vector_8::Vector_8()
+{
+    this->x = 0;
+    this->y = 0;
+    this->z = 0;
+}
+Vector_8::Vector_8(Vector& v)
+{
+    v.Normalize();
+    this->x = uint8_t(v.x);
+    this->y = uint8_t(v.y);
+    this->z = uint8_t(v.z);
+}
+Vector_8::Vector_8(Vector& a, Vector& b, Vector& c)//normal
 {
     Vector ab = b.Delta(a), ac = c.Delta(a);
     this->x = uint8_t((ab.y * ac.z - ab.z * ac.y) );
@@ -471,29 +336,29 @@ UnitVector::UnitVector(Vector& a, Vector& b, Vector& c)//normal
     this->z = uint8_t((ab.x * ac.y - ab.y * ac.x) );
 }
 
-bool UnitVector::isEqual(UnitVector v)
+bool Vector_8::isEqual(Vector_8 v)
 {
     if (this->x == v.x && this->y == v.y && this->z == v.z)
         return true;
     return false;
 }
-bool UnitVector::isExist()
+bool Vector_8::isExist()
 {
     if (this->x != 0 || this->y != 0 || this->z != 0)
         return true;
     return false;
 }
-void UnitVector::Equals(uint8_t x, uint8_t y, uint8_t z)
+void Vector_8::Equals(int8_t x, int8_t y, int8_t z)
 {
     this->x = x;
     this->y = y;
     this->z = z;
 }
-uint8_t UnitVector::ScalarProd(UnitVector v)
+int8_t Vector_8::ScalarProd(Vector_8 v)
 {
     return ((*this).x*v.x + (*this).y*v.y + (*this).z*v.z)/255;
 }
-void UnitVector::setRotation(Vector d)
+void Vector_8::setRotation(Vector d)
 {
     this->Equals(1, 0, 0);
     this->Equals(
@@ -514,7 +379,7 @@ void UnitVector::setRotation(Vector d)
         this->z * cos(d.z) - this->y * sin(d.z)
     );
 }
-void UnitVector::Rotate(Vector d)
+void Vector_8::Rotate(Vector d)
 {
     this->Equals(
         this->x * cos(d.x) - this->y * sin(d.x),
@@ -534,55 +399,15 @@ void UnitVector::Rotate(Vector d)
         this->z * cos(d.z) - this->y * sin(d.z)
     );
 }
-void UnitVector::Reverse()
+void Vector_8::Reverse()
 {
     this->x = -this->x;
     this->y = -this->y;
     this->z = -this->z;
 }
-void UnitVector::Reset()
+void Vector_8::Reset()
 {
     this->x = 0;
     this->y = 0;
     this->z = 0;
-}
-
-////////////////////////////////////////////BOUNDING2/////////////////////////////////////////////////////
-
-Bounding2::Bounding2()
-{
-    this->upper = false;
-    this->k = 0;
-    this->c = 0;
-}
-Bounding2::Bounding2(Vector2 p0, Vector2 p1, Vector2 v)
-{
-    if (p1.x == p0.x)
-        p1.x++;
-    this->k = (p1.y - p0.y)/(p1.x - p0.x);
-    this->c = p0.y - this->k*p0.x;
-    
-    this->upper = (v.y > this->k * v.x + this->c);
-}
-
-Vector2 Bounding2::intersection(Bounding2 b)
-{
-    int x = (b.c - this->c)/(this->k - b.k);
-    return Vector2(x, x*this->k + this->c);
-}
-
-bool Bounding2::isInBounds(Vector2& v)
-{
-    return  (v.y > this->k * v.x + this->c) == this->upper;
-}
-bool Bounding2::isInBounds(float x, float y)
-{
-    return  (y > this->k * x + this->c) == this->upper;
-}
-
-void Bounding2::Reset()
-{
-    this->upper = false;
-    this->k = 0;
-    this->c = 0;
 }
