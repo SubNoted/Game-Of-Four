@@ -220,6 +220,7 @@ void pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 v1, Vector2_16 v2, \
 
             light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
             if (light < 0) light = 0;
+            else if (light > 255) light = 255;
             
             // if (light == 255)
             // {
@@ -278,6 +279,7 @@ void pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 v1, Vector2_16 v2, \
 
             light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
             if (light < 0) light = 0;
+            else if (light > 255) light = 255;
             
             // if (light == 255)
             // {
