@@ -2,13 +2,13 @@
 
 ///////////////////* my extra (for TFT_eSPI (ripped of TFT_eSPI) ) /////////////
 
-uint16_t alphaBlend(uint8_t alpha, uint16_t fgc, uint16_t bgc)
+inline uint16_t alphaBlend(const uint8_t &alpha, const uint16_t &fgc, const uint16_t &bgc)
 {
     // Split out and blend 5-bit red and blue channels
-    uint32_t rxb = bgc & 0xF81F;
+    uint16_t rxb = bgc & 0xF81F;
     rxb += ((fgc & 0xF81F) - rxb) * (alpha >> 2) >> 6;
     // Split out and blend 6-bit green channel
-    uint32_t xgx = bgc & 0x07E0;
+    uint16_t xgx = bgc & 0x07E0;
     xgx += ((fgc & 0x07E0) - xgx) * alpha >> 8;
     // Recombine channels
     return (rxb & 0xF81F) | (xgx & 0x07E0);
@@ -37,9 +37,54 @@ void pushImage(int32_t x, int32_t y, int32_t w, int32_t h, uint16_t *_img, uint8
     }
 }
 
-void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int16_t x2,int16_t y2, \
-                               uint8_t uvx0,uint8_t uvy0, uint8_t uvx1,uint8_t uvy1, uint8_t uvx2,uint8_t uvy2, \
-                               uint8_t light, uint16_t* _img, uint8_t* data)
+inline void repose(Vector2_u8 &a, Vector2_u8 &b)
+{
+    uint8_t tmp = a.x;
+    a.x = b.x;
+    b.x = tmp;
+    tmp = a.y;
+    a.y = b.y;
+    b.y = tmp;
+}
+inline void repose(Vector2_16 &a, Vector2_16 &b)
+{
+    int16_t tmp = a.x;
+    a.x = b.x;
+    b.x = tmp;
+    tmp = a.y;
+    a.y = b.y;
+    b.y = tmp;
+}
+inline void repose(Vector &a, Vector &b)
+{
+    float tmp = a.x;
+    a.x = b.x;
+    b.x = tmp;
+    tmp = a.y;
+    a.y = b.y;
+    b.y = tmp;
+    tmp = a.z;
+    a.z = b.z;
+    b.z = tmp;
+}
+
+inline void repose(Vector_16 &a, Vector_16 &b)
+{
+    int16_t tmp = a.x;
+    a.x = b.x;
+    b.x = tmp;
+    tmp = a.y;
+    a.y = b.y;
+    b.y = tmp;
+    tmp = a.z;
+    a.z = b.z;
+    b.z = tmp;
+}
+
+void pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 v1, Vector2_16 v2, \
+                                Vector2_u8 uv0, Vector2_u8 uv1, Vector2_u8 uv2, \
+                                Vector vn0, Vector vn1, Vector vn2, \
+                                const Vector &lightDir, uint16_t* _img, uint8_t* data)
 {
     if (data == nullptr) return;  
     
@@ -47,32 +92,84 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
     uint8_t w0, w1, w2;
     uint8_t *ptro, *ptrs;
 
+    Vector norm;
+    int16_t light = 255;
     uint16_t color;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
-    if (y0 > y1) {
-        transpose(y0, y1); transpose(x0, x1);
-        transpose(uvy0, uvy1); transpose(uvx0, uvx1);
+    if (v0.y > v1.y) {
+        repose(v0, v1); repose(vn0, vn1); 
     }
-    if (y1 > y2) {
-        transpose(y2, y1); transpose(x2, x1);
-        transpose(uvy2, uvy1); transpose(uvx2, uvx1);
+    if (v1.y > v2.y) {
+        repose(v2, v1); repose(vn2, vn1);
     }
-    if (y0 > y1) {
-        transpose(y0, y1); transpose(x0, x1);
-        transpose(uvy0, uvy1); transpose(uvx0, uvx1);
+    if (v0.y > v1.y) {
+        repose(v0, v1); repose(vn0, vn1);
     }
 
+    
+    int16_t
+    dx01 = v1.x - v0.x,
+    dy01 = v1.y - v0.y,
+    dx02 = v2.x - v0.x,
+    dy02 = v2.y - v0.y,
+    dx12 = v2.x - v1.x,
+    dy12 = v2.y - v1.y,
+    sa   = 0,
+    sb   = 0;
 
-    if (y0 == y2) { // Handle awkward all-on-same-line case as its own thing
-        a = b = x0;
-        if (x1 < a)      a = x1;
-        else if (x1 > b) b = x1;
-        if (x2 < a)      a = x2;
-        else if (x2 > b) b = x2;
+    
+    S = (dy12 * dx02 - dx12 * dy02);
+    if (S == 0) return;
+
+    if (v0.y == v2.y) { // Handle awkward all-on-same-line case as its own thing
+        a = b = v0.x;
+        if (v1.x < a)      a = v1.x;
+        else if (v1.x > b) b = v1.x;
+        if (v2.x < a)      a = v2.x;
+        else if (v2.x > b) b = v2.x;
 
         // drawFastHLine(a, y0, b - a + 1, color);
         // sprite.drawFastHLine(a, y0, b - a + 1, TFT_DARKGREY);
+
+        for (x = a; x <= b; x++)
+        {
+            if (x < 0 || x >= SCRN_WIDTH) continue;
+
+
+            w0 = (-dy12 * (x - v2.x) + dx12 * (y - v2.y))*255 / S; //todo optimize
+            w1 = ( dy02 * (x - v2.x) - dx02 * (y - v2.y))*255 / S;
+            w2 = 255 - w0 - w1;
+
+
+            //light    
+            norm.z = vn0.z * w0 + vn1.z * w1 + vn2.z * w2;
+            if (norm.z < 0) continue;
+            norm.x = vn0.x * w0 + vn1.x * w1 + vn2.x * w2;
+            norm.y = vn0.y * w0 + vn1.y * w1 + vn2.y * w2;
+
+            light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
+            if (light < 0) light = 0;
+            
+            // if (light == 255)
+            // {
+            //     ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+            //     ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+            //     memcpy(ptrs, ptro, 2);
+            // }
+            // else
+            // {
+                // ptro = data + ((uint8_t(w0*uv0.x/255 + w1*uv1.x/255 + w2*uv2.x/255) + uint8_t(w0*uv0.y/255 + w1*uv1.y/255 + w2*uv2.y/255) * 256) << 1);
+                // color = ptro[0]<<8 | ptro[1];
+                color = TFT_WHITE;
+                
+                color = alphaBlend(light, color, TFT_DARKCYAN);
+
+                color = (color >> 8) | (color << 8);
+                _img[(x + y * SCRN_WIDTH)] = color;
+            // }
+        }
 
         ptro = data + ((x + y * 256) << 1);
         ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
@@ -83,13 +180,178 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
         return;
     }
 
+    // For upper part of triangle, find scanline crossings for segments
+    // 0-1 and 0-2.  If y1=y2 (flat-bottomed triangle), the scanline y1
+    // is included here (and second loop will be skipped, avoiding a /0
+    // error there), otherwise scanline y1 is skipped here and handled
+    // in the second loop...which also avoids a /0 error here if y0=y1
+    // (flat-topped triangle).
+    if (v1.y == v2.y) last = v1.y;  // Include y1 scanline
+    else         last = v1.y - 1; // Skip it
+
+    for (y = v0.y; y <= last; y++) {
+        if (y < 0 || y >= SCRN_HEIGHT) continue;
+
+        a   = v0.x + sa / dy01;
+        b   = v0.x + sb / dy02;
+        sa += dx01;
+        sb += dx02;
+
+        if (a > b) transpose(a, b);        
+        // sprite.drawFastHLine(a, y, b - a + 1, TFT_DARKGREY);
+        
+        // pushImageLine(a, y, b - a + 1, _img, data);
+        
+        for (x = a; x <= b; x++)
+        {
+            if (x < 0 || x >= SCRN_WIDTH) continue;
+
+
+            w0 = (-dy12 * (x - v2.x) + dx12 * (y - v2.y))*255 / S; //todo optimize
+            w1 = ( dy02 * (x - v2.x) - dx02 * (y - v2.y))*255 / S;
+            w2 = 255 - w0 - w1;
+
+
+            //light    
+            norm.z = vn0.z * w0 + vn1.z * w1 + vn2.z * w2;
+            if (norm.z < 0) continue;
+            norm.x = vn0.x * w0 + vn1.x * w1 + vn2.x * w2;
+            norm.y = vn0.y * w0 + vn1.y * w1 + vn2.y * w2;
+
+            light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
+            if (light < 0) light = 0;
+            
+            // if (light == 255)
+            // {
+            //     ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+            //     ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+            //     memcpy(ptrs, ptro, 2);
+            // }
+            // else
+            // {
+                // ptro = data + ((uint8_t(w0*uv0.x/255 + w1*uv1.x/255 + w2*uv2.x/255) + uint8_t(w0*uv0.y/255 + w1*uv1.y/255 + w2*uv2.y/255) * 256) << 1);
+                // color = ptro[0]<<8 | ptro[1];
+                color = TFT_WHITE;
+                
+                color = alphaBlend(light, color, TFT_DARKCYAN);
+
+                color = (color >> 8) | (color << 8);
+                _img[(x + y * SCRN_WIDTH)] = color;
+            // }
+        }
+        
+    }
+
+    // For lower part of triangle, find scanline crossings for segments
+    // 0-2 and 1-2.  This loop is skipped if y1=y2.
+    sa = dx12 * (y - v1.y);
+    sb = dx02 * (y - v0.y);
+    for (; y <= v2.y; y++) {
+        if (y < 0 || y >= SCRN_HEIGHT) continue;
+
+        a   = v1.x + sa / dy12;
+        b   = v0.x + sb / dy02;
+        sa += dx12;
+        sb += dx02;
+
+        if (a > b) transpose(a, b);
+        // sprite.drawFastHLine(a, y, b - a + 1, TFT_DARKGREY);
+
+        // pushImageLine(a, y, b - a + 1, _img, data);
+
+        for (x = a; x < b + 1; x++)
+        {
+            if (x < 0 || x >= SCRN_WIDTH) continue;
+
+
+            w0 = (-dy12 * (x - v2.x) + dx12 * (y - v2.y))*255 / S; //todo optimize
+            w1 = ( dy02 * (x - v2.x) - dx02 * (y - v2.y))*255 / S;
+            w2 = 255 - w0 - w1;
+
+
+            //light    
+            norm.z = vn0.z * w0 + vn1.z * w1 + vn2.z * w2;
+            if (norm.z < 0) continue;
+            norm.x = vn0.x * w0 + vn1.x * w1 + vn2.x * w2;
+            norm.y = vn0.y * w0 + vn1.y * w1 + vn2.y * w2;
+
+            light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
+            if (light < 0) light = 0;
+            
+            // if (light == 255)
+            // {
+            //     ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
+            //     ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+            //     memcpy(ptrs, ptro, 2);
+            // }
+            // else
+            // {
+                // ptro = data + ((uint8_t(w0*uv0.x/255 + w1*uv1.x/255 + w2*uv2.x/255) + uint8_t(w0*uv0.y/255 + w1*uv1.y/255 + w2*uv2.y/255) * 256) << 1);
+                // color = ptro[0]<<8 | ptro[1];
+                color = TFT_WHITE;
+                
+                color = alphaBlend(light, color, TFT_DARKCYAN);
+
+                color = (color >> 8) | (color << 8);
+                _img[(x + y * SCRN_WIDTH)] = color;
+            // }
+        }
+
+    }
+}
+void pushColorTriangleToCanvas(Vector2_16 v0, Vector2_16 v1, Vector2_16 v2, \
+                                Vector vn0, Vector vn1, Vector vn2, \
+                               const Vector &lightDir, uint16_t* _img, const uint16_t &color)
+{
+    
+    int16_t a, b, y, x, last, S;
+    uint8_t w0, w1, w2;
+    uint8_t *ptrs;
+
+    Vector norm;
+    int16_t light = 255;
+    uint16_t col;
+
+    // Sort coordinates by Y order (y2 >= y1 >= y0)
+    if (v0.y > v1.y) {
+        repose(v0, v1); repose(vn0, vn1);
+    }
+    if (v1.y > v2.y) {
+        repose(v2, v1); repose(vn2, vn1);
+    }
+    if (v0.y > v1.y) {
+        repose(v0, v1); repose(vn0, vn1);
+    }
+
+
+    // if (y0 == y2) { // Handle awkward all-on-same-line case as its own thing
+    //     a = b = x0;
+    //     if (x1 < a)      a = x1;
+    //     else if (x1 > b) b = x1;
+    //     if (x2 < a)      a = x2;
+    //     else if (x2 > b) b = x2;
+
+    //     // drawFastHLine(a, y0, b - a + 1, color);
+    //     // sprite.drawFastHLine(a, y0, b - a + 1, TFT_DARKGREY);
+
+    //     ptro = data + ((x + y * 256) << 1);
+    //     ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+
+    //     memcpy(ptrs, ptro, 2);
+
+
+    //     return;
+    // }
+
     int16_t
-    dx01 = x1 - x0,
-    dy01 = y1 - y0,
-    dx02 = x2 - x0,
-    dy02 = y2 - y0,
-    dx12 = x2 - x1,
-    dy12 = y2 - y1,
+    dx01 = v1.x - v0.x,
+    dy01 = v1.y - v0.y,
+    dx02 = v2.x - v0.x,
+    dy02 = v2.y - v0.y,
+    dx12 = v2.x - v1.x,
+    dy12 = v2.y - v1.y,
     sa   = 0,
     sb   = 0;
 
@@ -103,12 +365,14 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
     // error there), otherwise scanline y1 is skipped here and handled
     // in the second loop...which also avoids a /0 error here if y0=y1
     // (flat-topped triangle).
-    if (y1 == y2) last = y1;  // Include y1 scanline
-    else         last = y1 - 1; // Skip it
+    if (v1.y == v2.y) last = v1.y;  // Include y1 scanline
+    else         last = v1.y - 1; // Skip it
 
-    for (y = y0; y <= last; y++) {
-        a   = x0 + sa / dy01;
-        b   = x0 + sb / dy02;
+    for (y = v0.y; y <= last; y++) {
+        if (y < 0 || y >= SCRN_HEIGHT) continue;
+
+        a   = v0.x + sa / dy01;
+        b   = v0.x + sb / dy02;
         sa += dx01;
         sb += dx02;
 
@@ -119,38 +383,38 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
         
         for (x = a; x <= b; x++)
         {
-            w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
-            w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
+            if (x < 0 || x >= SCRN_WIDTH) continue;
+
+            w0 = (-dy12 * (x - v2.x) + dx12 * (y - v2.y))*255 / S; //todo optimize
+            w1 = ( dy02 * (x - v2.x) - dx02 * (y - v2.y))*255 / S;
             w2 = 255 - w0 - w1;
+
+            norm.z = vn0.z * w0 + vn1.z * w1 + vn2.z * w2;
+            if (norm.z < 0) return;
+            norm.x = vn0.x * w0 + vn1.x * w1 + vn2.x * w2;
+            norm.y = vn0.y * w0 + vn1.y * w1 + vn2.y * w2;
+
+            light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
+            if (light < 0) light = 0;
             
-            if (light == 255)
-            {
-                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
-                ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
-
-                memcpy(ptrs, ptro, 2);
-            }
-            else
-            {
-                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
-                color = ptro[0]<<8 | ptro[1];
-                
-                color = alphaBlend(light, color, TFT_DARKCYAN);
-
-                color = (color >> 8) | (color << 8);
-                _img[(x + y * SCRN_WIDTH)] = color;
-            }
+            ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+            
+            col = alphaBlend(light, color, TFT_BLACK);
+            col = (col >> 8) | (col << 8);
+            *ptrs = col;
         }
         
     }
 
     // For lower part of triangle, find scanline crossings for segments
     // 0-2 and 1-2.  This loop is skipped if y1=y2.
-    sa = dx12 * (y - y1);
-    sb = dx02 * (y - y0);
-    for (; y <= y2; y++) {
-        a   = x1 + sa / dy12;
-        b   = x0 + sb / dy02;
+    sa = dx12 * (y - v1.y);
+    sb = dx02 * (y - v0.y);
+    for (; y <= v2.y; y++) {
+        if (y < 0 || y >= SCRN_HEIGHT) continue;
+
+        a   = v1.x + sa / dy12;
+        b   = v0.x + sb / dy02;
         sa += dx12;
         sb += dx02;
 
@@ -161,27 +425,34 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
 
         for (x = a; x < b + 1; x++)
         {
-            w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
-            w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
-            w2 = 1 - w0 - w1;
+            if (x < 0 || x >= SCRN_WIDTH) continue;
+
+
+            w0 = (-dy12 * (x - v2.x) + dx12 * (y - v2.y))*255 / S;
+            w1 = ( dy02 * (x - v2.x) - dx02 * (y - v2.y))*255 / S;
+            w2 = 255 - w0 - w1;
+
+            norm.z = vn0.z * w0 + vn1.z * w1 + vn2.z * w2;
+            if (norm.z < 0) return;
+            norm.x = vn0.x * w0 + vn1.x * w1 + vn2.x * w2;
+            norm.y = vn0.y * w0 + vn1.y * w1 + vn2.y * w2;
+
+            light = (norm.x * lightDir.x + norm.y * lightDir.y + norm.z * lightDir.z);
+            if (light < 0) light = 0;
             
-            if (light == 255)
-            {
-                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
-                ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+            // if (light == 255)
+            // {
+            //     ptrs = (uint8_t *)_img + (uint16_t(x + y * SCRN_WIDTH) << 1);
 
-                memcpy(ptrs, ptro, 2);
-            }
-            else
-            {
-                ptro = data + ((uint8_t(w0*uvx0/255 + w1*uvx1/255 + w2*uvx2/255) + uint8_t(w0*uvy0/255 + w1*uvy1/255 + w2*uvy2/255) * 256) << 1);
-                color = ptro[0]<<8 | ptro[1];
-                
-                color = alphaBlend(light, color, TFT_DARKCYAN);
-
-                color = (color >> 8) | (color << 8);
-                _img[(x + y * SCRN_WIDTH)] = color;
-            }
+            //     col = (col >> 8) | (col << 8);
+            //     *ptrs = col;
+            // }
+            // else
+            ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
+            
+            col = alphaBlend(light, color, TFT_BLACK);
+            col = (col >> 8) | (col << 8);
+            *ptrs = col;
         }
 
     }
@@ -191,8 +462,6 @@ void pushImageTriangleToCanvas(int16_t x0,int16_t y0, int16_t x1,int16_t y1, int
 
 void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) 
 {
-    Debug::prerenderTimeSum += micros() - Debug::prerenderTime;
-
     for (uint8_t cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {
         Debug::renderTime = micros();
@@ -205,43 +474,29 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
             for (uint16_t i = 0; i < entities[entityNum]->polyLength; i++) //polygons
             {
                 Polygon polygon = entity->polygons[i];
-                Vector verts[3] = { entity->vertices[polygon.v[0]], 
-                                    entity->vertices[polygon.v[1]], 
-                                    entity->vertices[polygon.v[2]]};
+                Vector2_16 verts[3] = { entity->vertices_b[polygon.v[0]], 
+                                        entity->vertices_b[polygon.v[1]],
+                                        entity->vertices_b[polygon.v[2]]};
+                Vector2_u8 uv[3] = { entity->textureCoords[polygon.vt[0]],
+                                    entity->textureCoords[polygon.vt[1]],
+                                    entity->textureCoords[polygon.vt[2]]};
+                Vector norms[3] = { entity->normals[polygon.vn[0]], 
+                                    entity->normals[polygon.vn[1]], 
+                                    entity->normals[polygon.vn[2]]};
+                
+                //if out of screen
+                if (verts[0].x < 0 && verts[0].y < 0 && verts[1].x < 0 && verts[1].y < 0 && verts[2].x < 0 && verts[2].y < 0 ||\
+                verts[0].x > SCRN_WIDTH && verts[0].y > SCRN_HEIGHT && verts[1].x > SCRN_WIDTH && verts[1].y > SCRN_HEIGHT && verts[2].x > SCRN_WIDTH && verts[2].y > SCRN_HEIGHT)
+                    continue;
 
-                float s = entity->Size;
-                Vector o = entity->O;
-                
-                verts[0].x = verts[0].x*s + o.x;
-                verts[0].y = verts[0].y*s + o.y;
-                verts[0].z = verts[0].z*s + o.z;
-                verts[1].x = verts[1].x*s + o.x;
-                verts[1].y = verts[1].y*s + o.y;
-                verts[1].z = verts[1].z*s + o.z;
-                verts[2].x = verts[2].x*s + o.x;
-                verts[2].y = verts[2].y*s + o.y;
-                verts[2].z = verts[2].z*s + o.z;
-
-                // verts[j].toFOV_XY(FOV);
+                // Vector normal(Vector::Normal(verts[0], verts[1], verts[2]));
+                // Vector normal((norms[0].x + norms[0].y + norms[0].z)/3, (norms[1].x + norms[1].y + norms[1].z)/3, (norms[2].x + norms[2].y + norms[2].z)/3);
                 
                 
-                // w0 = (-dy12 * (x - x2) + dx12 * (y - y2))*255 / S;
-                // w1 = ( dy02 * (x - x2) - dx02 * (y - y2))*255 / S;
-                // w2 = 255 - w0 - w1;
-                // Vector normal = Vector::Normal(verts[0], verts[1], verts[2]);
-                
-                // // if (normal.z < 0) continue;
+                // if (normal.z < 0) continue;
 
                 // uint16_t color = TFT_WHITE;
                 // float shade = normal.ScalarProd(lightDirection)/2+0.5; //todo optimize to unitvector
-                
-                // canvas[cnvsNum].pushImage
-                // canvas[cnvsNum].fillTriangle(
-                //     verts[0].x, verts[0].y,
-                //     verts[1].x, verts[1].y,
-                //     verts[2].x, verts[2].y,
-                //     color
-                // );
 
                 // pushImage(0,0, 64, 32, cnvsPtr[cnvsNum], blazeTex);
 
@@ -258,28 +513,40 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 //     cnvsPtr[cnvsNum],
                 //     entities[entityNum]->texture
                 // );
+
+                // pushColorTriangleToCanvas(
+                //     verts[0], verts[1], verts[2],
+                //     // uv[0], uv[1], uv[2],
+                //     norms[0], norms[1], norms[2],
+                //     lightDirection,
+                //     cnvsPtr[cnvsNum],
+                //     TFT_WHITE
+                // );
+                pushImageTriangleToCanvas(
+                    verts[0], verts[1], verts[2],
+                    uv[0], uv[1], uv[2],
+                    norms[0], norms[1], norms[2],
+                    lightDirection,
+                    cnvsPtr[cnvsNum],
+                    entity->textureMeta[polygon.texid]
+                );
 #if DEBUG_MODE
-                // canvas[cnvsNum].drawTriangle(
+
+                // canvas[cnvsNum].fillTriangle(
                 //     verts[0].x, verts[0].y,
                 //     verts[1].x, verts[1].y,
                 //     verts[2].x, verts[2].y,
+                //     TFT_RED//alphaBlend(shade*255, color, TFT_BLACK)
+                // );
+
+                // drawTriangle(
+                //     verts[0].x, verts[0].y,
+                //     verts[1].x, verts[1].y,
+                //     verts[2].x, verts[2].y,
+                //     canvas[cnvsNum],
                 //     TFT_DARKGREY
                 // );
-                drawTriangle(
-                    verts[0].x, verts[0].y,
-                    verts[1].x, verts[1].y,
-                    verts[2].x, verts[2].y,
-                    canvas[cnvsNum],
-                    TFT_DARKGREY
-                );
-
-                // log_d("0: %f %f %f", entities[entityNum]->O.x, entities[entityNum]->O.y, entities[entityNum]->O.z);
-                // canvas[cnvsNum].drawCircle(
-                //     entities[entityNum]->O.x, entities[entityNum]->O.y, 10,
-                //     TFT_RED
-                // );
 #endif
-
             }
         }
 
