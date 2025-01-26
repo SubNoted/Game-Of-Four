@@ -172,6 +172,11 @@ void Vector::Normalize()
     this->y = this->y/m;
     this->z = this->z/m;
 }
+Vector Vector::getNormalized()
+{
+    float m = this->L();
+    return Vector(this->x/m, this->y/m, this->z/m);
+}
 
 float Vector::ScalarProd(Vector v)
 {

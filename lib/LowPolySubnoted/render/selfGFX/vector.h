@@ -44,6 +44,7 @@ class Vector
         Equals(const float &x, const float &y);
 
     void Normalize();
+    Vector getNormalized();
 
     float ScalarProd(Vector v);
 
