@@ -103,7 +103,7 @@ public:
 
     void createCube(Vector o, Vector size);
 
-    void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t vLength, const uint16_t f[][10], const uint16_t fLength, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t texLength);
+    void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t** texMeta, const uint8_t* tex_w, const uint8_t* tex_h, const uint8_t &texLength);
     
     
     void updateBuffer();

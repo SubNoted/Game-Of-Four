@@ -312,6 +312,20 @@ Vector Vector::Normal(Vector& a, Vector& b, Vector& c)
     return Vector(ab.y * ac.z - ab.z * ac.y, ab.z * ac.x - ab.x * ac.z, ab.x * ac.y - ab.y * ac.x);
 }
 
+////////////////////////////////////////////Vector_16/////////////////////////////////////////
+
+
+int16_t Vector_16::L(void)
+{
+    return sqrt(x*x + y*y + z*z);
+}
+
+Vector_16 Vector_16::getNormalized()
+{
+    int16_t m = this->L();
+    return Vector_16(this->x*255/m, this->y*255/m, this->z*255/m);
+}
+
 ////////////////////////////////////////////Vector_8/////////////////////////////////////////
 
 Vector_8::Vector_8(int8_t x, int8_t y, int8_t z)
@@ -415,4 +429,15 @@ void Vector_8::Reset()
     this->x = 0;
     this->y = 0;
     this->z = 0;
+}
+
+int8_t Vector_8::L(void)
+{
+    return sqrt(x*x + y*y + z*z);
+}
+
+Vector_8 Vector_8::getNormalized()
+{
+    int8_t m = this->L();
+    return Vector_8(this->x*127/m, this->y*127/m, this->z*127/m);
 }

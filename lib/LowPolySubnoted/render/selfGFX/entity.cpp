@@ -80,7 +80,7 @@ void Entity::init(std::vector<Entity*>& entities)
 }
 
 
-void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t vLength, const uint16_t f[][10], const uint16_t fLength, uint8_t** texMeta, uint8_t* tex_w, uint8_t* tex_h, uint8_t texLength)
+void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t** texMeta, const uint8_t* tex_w, const uint8_t* tex_h, const uint8_t &texLength)
 {
     this->vertLength = vLength;
     this->polyLength = fLength;
@@ -89,7 +89,7 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
     this->textureCoords = new Vector2_u8[this->vertLength];
     this->normals = new Vector[this->vertLength];
 
-    this->vertices_b = new Vector2_16[this->vertLength];
+    this->vertices_b = (Vector2_16 *)heap_caps_calloc(this->vertLength, sizeof(Vector2_16), MALLOC_CAP_INTERNAL);
 
     for (int i = 0; i < this->vertLength; i++)
     {
@@ -113,7 +113,7 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
     this->textureHeight = new uint8_t[this->texturesLength];
     for (int i = 0; i < this->texturesLength; i++)
     {
-        this->textureMeta[i] = texMeta[i];
+        // this->textureMeta[i] = texMeta[i];//todo fix
         this->textureWidth[i] = tex_w[i];
         this->textureHeight[i] = tex_h[i];
     }
@@ -208,31 +208,21 @@ Vector Entity::getPosition()
     return this->O;
 }
 
-void Entity::setRotation(Vector v)
+void Entity::setRotation(Vector a)
 {    
-    //todo fix
-    // vertices[0] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//0
-    // vertices[1] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z + Size.z/2).Rotate(v, O));//1
-    // vertices[2] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//2
-    // vertices[3] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z + Size.z/2).Rotate(v, O));//3
-
-    // vertices[4] = (Vector(O.x - Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//4
-    // vertices[5] = (Vector(O.x + Size.x/2, O.y + Size.y/2, O.z - Size.z/2).Rotate(v, O));//5
-    // vertices[6] = (Vector(O.x + Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//6
-    // vertices[7] = (Vector(O.x - Size.x/2, O.y - Size.y/2, O.z - Size.z/2).Rotate(v, O));//7
+    if (a.isEqual(Angle))
+        return;
+    this->rotate(a.Delta(this->Angle));
 }
-void Entity::rotate(Vector v)
+void Entity::rotate(Vector a)
 {
-    // if (v.isEqual(Angle))
-    //     return;
-    // this->Angle.Equals(v);
-    // Update = true;
-
-    this->Angle.Plus(v);
+    if (!a.isExist())
+        return;
+    this->Angle.Plus(a);
     for (int i = 0; i < vertLength; i++)
     {
-        vertices[i].Rotate(v);
-        normals[i].Rotate(v);
+        vertices[i].Rotate(a);
+        normals[i].Rotate(a);
     }
 }
 Vector Entity::getAngle()

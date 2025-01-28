@@ -13,7 +13,7 @@ public:
     virtual ~IRendererStrategy() = default;
     virtual void renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) = 0;
     
-    Vector lightDirection = Vector(0,-0.3,1).getNormalized();
+    Vector_16 lightDirection = Vector_16(0,-3,10).getNormalized();
     float FOV = Settings::fov;
 };
 

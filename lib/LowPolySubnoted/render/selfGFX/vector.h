@@ -86,6 +86,14 @@ class Vector_16
         this->y = y;
         this->z = z;
     };
+    Vector_16(Vector& v)
+    {
+        this->x = v.x;
+        this->y = v.y;
+        this->z = v.z;
+    };
+    int16_t L(void);
+    Vector_16 getNormalized();
 };
 class Vector_8
 {
@@ -103,6 +111,9 @@ public:
         Equals(int8_t x, int8_t y, int8_t z);
 
     int8_t ScalarProd(Vector_8 v);
+    
+    int8_t L(void);
+    Vector_8 getNormalized();
 
     void setRotation(Vector alp);
     void Rotate(Vector alp);
