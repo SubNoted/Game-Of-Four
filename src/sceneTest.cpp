@@ -45,6 +45,8 @@ void Tscene::enter() {
     cube.createModel(blazeModel_PARAMETRS);
     cube.Size = 25;
     cube.O.Equals(120,270,60);
+    cube.setRotation(Vector(PI,0,0));
+
     // cube.createCube(Vector(x, y, 100), Vector(size));
 
     //texture
@@ -52,7 +54,6 @@ void Tscene::enter() {
     // cube.textureHeight = 256;
     // cube.textureWidth = 256;
 
-    //cube.setRotation(Vector(0,10,20));
 }
 
 void Tscene::exit() {
