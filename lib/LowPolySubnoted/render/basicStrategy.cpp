@@ -2,18 +2,6 @@
 
 ///////////////////* my extra (for TFT_eSPI (ripped of TFT_eSPI) ) /////////////
 
-inline uint16_t alphaBlend(const uint8_t &alpha, const uint16_t &fgc, const uint16_t &bgc)
-{
-    // Split out and blend 5-bit red and blue channels
-    uint16_t rxb = bgc & 0xF81F;
-    rxb += ((fgc & 0xF81F) - rxb) * (alpha >> 2) >> 6;
-    // Split out and blend 6-bit green channel
-    uint16_t xgx = bgc & 0x07E0;
-    xgx += ((fgc & 0x07E0) - xgx) * alpha >> 8;
-    // Recombine channels
-    return (rxb & 0xF81F) | (xgx & 0x07E0);
-}
-
 inline void drawTriangle(int32_t x0, int32_t y0, int32_t x1, int32_t y1, int32_t x2, int32_t y2, TFT_eSprite &canvas, uint16_t color)
 {
     canvas.drawLine(x0, y0, x1, y1, color);
@@ -86,7 +74,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
                                 int16_t light0, int16_t light1, int16_t light2, \
                                 uint16_t* _img, uint8_t* data)
 {
-    if (data == nullptr) return;
+    //if (data == nullptr) return;
     
     int16_t a, b, y, x, last;
     int16_t w0, w1, w2;
@@ -104,6 +92,15 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
     if (v0.y > v1.y) {
         repose(v0, v1); transpose(light0, light1);
     }
+
+    uint16_t maxX = v2.x, minX = v0.x, dx;
+    if (maxX < v1.x) maxX = v1.x;
+    if (maxX < v0.x) maxX = v0.x;
+    if (minX > v1.x) minX = v1.x;
+    if (minX > v2.x) minX = v2.x;
+    dx =(maxX - minX + 1);
+    // uint8_t* polyCanvas = (uint8_t*)alloca((v2.y - v0.y + 1) * dx * sizeof(uint16_t));
+    // if (polyCanvas == nullptr) return;
     
     int16_t
     dx01 = v1.x - v0.x,
@@ -114,7 +111,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
     dy12 = v2.y - v1.y,
     sa   = 0,
     sb   = 0;
-    uint16_t
+    int16_t
     S = (dy12 * dx02 - dx12 * dy02),
     dx12_S = 255*(dx12)/S,
     dy12_S = 255*(dy12)/S,
@@ -140,13 +137,21 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
         int16_t lightBuffer = 0;
         for (x = a; x <= b; x++)
         {
+            uint16_t color;
             if (x < 0 || x >= SCRN_WIDTH) continue;
+            int16_t light = 0;
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
 
-            light = light0 * w0 + light1 * w1 + light2 * w2;
+            // z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>2;
+            // if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
+            //     continue;
+            // }
+            // z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
+
+            light = (light0 * w0 + light1 * w1 + light2 * w2)/127 + 127;
             if (light < 0) light = 0;
             else if (light > 255) light = 255;
             color = TFT_WHITE;
@@ -191,9 +196,12 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
         for (x = a; x <= b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
+            int16_t light = 0;
+            uint16_t color;
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
+            w2 = 255 - w0 - w1;
 
             z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>10;
             if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
@@ -201,7 +209,6 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
                 continue;
             } 
             z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
-            w2 = 255 - w0 - w1;
 
             light = (light0 * w0 + light1 * w1 + light2 * w2)/127;
             if (light < 0) light = 0;
@@ -212,11 +219,12 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             // }
             // lightBuffer = light;
             
-            // color = alphaBlend(light, color, TFT_DARKCYAN);
-            rxb = TFT_BLUE & 0xF81F;
+            color = TFT_WHITE;
+            
+            rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
             // Split out and blend 6-bit green channel
-            xgx = TFT_BLUE & 0x07E0;
+            xgx = TFT_BLACK & 0x07E0;
             xgx += ((color & 0x07E0) - xgx) * light >> 8;
             // Recombine channels
             color = (rxb & 0xF81F) | (xgx & 0x07E0);
@@ -243,9 +251,12 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
 
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
+        // int16_t lightBuffer = 0;
         for (x = a; x <= b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
+            int16_t light = 0;
+            uint16_t color;
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
@@ -260,18 +271,19 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
 
             light = (light0 * w0 + light1 * w1 + light2 * w2)/127;
             if (light < 0) light = 0;
-            else if (light > 255) {
-            light = 255;
-            // return;
-            }
+            // if (light>>4 == lightBuffer>>4)
+            // {
+            //     _img[(x + y * SCRN_WIDTH)] = colorBuffer;
+            //     continue;
+            // }
+            // lightBuffer = light;
             
-            color = TFT_RED;
+            color = TFT_WHITE;
             
-            // color = alphaBlend(light, color, TFT_DARKCYAN);
-            rxb = TFT_BLUE & 0xF81F;
+            rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
             // Split out and blend 6-bit green channel
-            xgx = TFT_BLUE & 0x07E0;
+            xgx = TFT_BLACK & 0x07E0;
             xgx += ((color & 0x07E0) - xgx) * light >> 8;
             // Recombine channels
             color = (rxb & 0xF81F) | (xgx & 0x07E0);
@@ -378,7 +390,7 @@ void BasicRendererStrategy::pushColorTriangleToCanvas(Vector2_16 v0, Vector2_16 
             
             ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
             
-            col = alphaBlend(light, color, TFT_BLACK);
+            // col = alphaBlend(light, color, TFT_BLACK);
             col = (col >> 8) | (col << 8);
             *ptrs = col;
         }
@@ -429,7 +441,7 @@ void BasicRendererStrategy::pushColorTriangleToCanvas(Vector2_16 v0, Vector2_16 
             // else
             ptrs = (uint8_t *)_img + ((x + y * SCRN_WIDTH) << 1);
             
-            col = alphaBlend(light, color, TFT_BLACK);
+            // col = alphaBlend(light, color, TFT_BLACK);
             col = (col >> 8) | (col << 8);
             *ptrs = col;
         }
@@ -455,7 +467,7 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
             for (uint16_t i = 0; i < entities[entityNum]->polyLength; i++) //polygons
             {
                 Polygon polygon = entity->polygons[i];
-                Vector2_16 verts[3] = { entity->vertices_b[polygon.v[0]],
+                Vector_16 verts[3] = {  entity->vertices_b[polygon.v[0]],
                                         entity->vertices_b[polygon.v[1]],
                                         entity->vertices_b[polygon.v[2]]};
                 //if out of screen
@@ -468,10 +480,10 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                 Vector norms[3] = {(entity->normals[polygon.vn[0]]),
                                     (entity->normals[polygon.vn[1]]), 
                                     (entity->normals[polygon.vn[2]])};
-                if (norms[0].z < 0 || norms[1].z < 0 || norms[2].z < 0) continue;
-                int16_t light[3] = {((norms[0].x * lightDirection.x)*127 + (norms[0].y * lightDirection.y)*127 + (norms[0].z * lightDirection.z)*127),
-                                    ((norms[1].x * lightDirection.x)*127 + (norms[1].y * lightDirection.y)*127 + (norms[1].z * lightDirection.z)*127),
-                                    ((norms[2].x * lightDirection.x)*127 + (norms[2].y * lightDirection.y)*127 + (norms[2].z * lightDirection.z)*127)};
+                // if (norms[0].z < 0 || norms[1].z < 0 || norms[2].z < 0) continue;
+                int16_t light[3] = {((norms[0].x * lightDirection.x) + (norms[0].y * lightDirection.y) + (norms[0].z * lightDirection.z)),
+                                    ((norms[1].x * lightDirection.x) + (norms[1].y * lightDirection.y) + (norms[1].z * lightDirection.z)),
+                                    ((norms[2].x * lightDirection.x) + (norms[2].y * lightDirection.y) + (norms[2].z * lightDirection.z))};
                 
 
                 // Vector normal(Vector::Normal(verts[0], verts[1], verts[2]));

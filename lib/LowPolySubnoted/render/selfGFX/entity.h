@@ -22,7 +22,7 @@ protected:
     friend class IRendererStrategy;
     friend class BasicRendererStrategy;
     
-    Vector2_16* vertices_b; //buffer
+    Vector_16* vertices_b; //buffer
 
     Vector* vertices;
     Vector2_u8* textureCoords;

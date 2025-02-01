@@ -89,7 +89,7 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
     this->textureCoords = new Vector2_u8[this->vertLength];
     this->normals = new Vector[this->vertLength];
 
-    this->vertices_b = (Vector2_16 *)heap_caps_calloc(this->vertLength, sizeof(Vector2_16), MALLOC_CAP_INTERNAL);
+    this->vertices_b = (Vector_16 *)heap_caps_calloc(this->vertLength, sizeof(Vector_16), MALLOC_CAP_INTERNAL);
 
     for (int i = 0; i < this->vertLength; i++)
     {
@@ -123,7 +123,9 @@ void Entity::updateBuffer()
 {
     for (uint16_t i = 0; i < this->vertLength; i++)
     {
-        this->vertices_b[i].Equals(this->vertices[i].x*this->Size + O.x, this->vertices[i].y*this->Size + O.y);
+        this->vertices_b[i].x = this->vertices[i].x*this->Size + O.x; 
+        this->vertices_b[i].y = this->vertices[i].y*this->Size + O.y;
+        this->vertices_b[i].z = this->vertices[i].z*this->Size + O.z;
     }
 }
 

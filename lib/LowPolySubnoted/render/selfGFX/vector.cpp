@@ -323,7 +323,7 @@ int16_t Vector_16::L(void)
 Vector_16 Vector_16::getNormalized()
 {
     int16_t m = this->L();
-    return Vector_16(this->x*255/m, this->y*255/m, this->z*255/m);
+    return Vector_16(this->x*127/m, this->y*127/m, this->z*127/m);//todo fix
 }
 
 ////////////////////////////////////////////Vector_8/////////////////////////////////////////
