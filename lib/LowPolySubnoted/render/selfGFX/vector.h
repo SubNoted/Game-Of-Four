@@ -82,16 +82,18 @@ class Vector_16
     };
     Vector_16(int16_t x, int16_t y, int16_t z)
     {
-        this->x = x;
-        this->y = y;
-        this->z = z;
+        this->x = (int16_t)x;
+        this->y = (int16_t)y;
+        this->z = (int16_t)z;
     };
-    Vector_16(Vector& v)
+    
+    Vector_16(const Vector& v)
     {
-        this->x = v.x;
-        this->y = v.y;
-        this->z = v.z;
+        this->x = (int16_t)(v.x*255);
+        this->y = (int16_t)(v.y*255);
+        this->z = (int16_t)(v.z*255);
     };
+
     int16_t L(void);
     Vector_16 getNormalized();
 };
