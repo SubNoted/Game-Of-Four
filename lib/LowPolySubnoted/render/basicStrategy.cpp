@@ -81,7 +81,7 @@ inline void repose(Vector_16 &a, Vector_16 &b)
     b.z = tmp;
 }
 
-void BasicRendererStrategy::pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 v1, Vector2_16 v2, \
+void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
                                 Vector2_u8 uv0, Vector2_u8 uv1, Vector2_u8 uv2, \
                                 int16_t light0, int16_t light1, int16_t light2, \
                                 uint16_t* _img, uint8_t* data)
@@ -92,9 +92,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 
     int16_t w0, w1, w2;
     uint8_t *ptro, *ptrs;
 
-    Vector_16 norm;
-    int16_t light = 0;
-    uint16_t color;
+    uint16_t z_buffer_buffer = 0;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
     if (v0.y > v1.y) {
@@ -139,6 +137,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 
 
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
+        int16_t lightBuffer = 0;
         for (x = a; x <= b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
@@ -151,7 +150,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 
             if (light < 0) light = 0;
             else if (light > 255) light = 255;
             color = TFT_WHITE;
-            
+
             // Split out and blend 5-bit red and blue channels
             rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
@@ -188,21 +187,30 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 
         
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
+        // int16_t lightBuffer = 0;
         for (x = a; x <= b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
+
+            z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>10;
+            if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
+                // log_d("z_buff: %d", z_buffer_buffer);
+                continue;
+            } 
+            z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
             w2 = 255 - w0 - w1;
 
             light = (light0 * w0 + light1 * w1 + light2 * w2)/127;
             if (light < 0) light = 0;
-            else if (light > 255) {
-            light = 255;
-            //return;
-            }
-            color = TFT_RED;
+            // if (light>>4 == lightBuffer>>4)
+            // {
+            //     _img[(x + y * SCRN_WIDTH)] = colorBuffer;
+            //     continue;
+            // }
+            // lightBuffer = light;
             
             // color = alphaBlend(light, color, TFT_DARKCYAN);
             rxb = TFT_BLUE & 0xF81F;
@@ -242,6 +250,13 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector2_16 v0, Vector2_16 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
+
+            
+            z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>10;
+            if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
+                continue;
+            }
+            z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
 
             light = (light0 * w0 + light1 * w1 + light2 * w2)/127;
             if (light < 0) light = 0;
@@ -430,6 +445,8 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
     {
         Debug::renderTime = micros();
         canvas[cnvsNum].fillScreen(TFT_SKYBLUE);
+
+        memset(z_buffer, 255, SCRN_WIDTH*SCRN_HEIGHT*sizeof(uint8_t));
 
         //actual rendering
         for (uint8_t entityNum = 0; entityNum < entities.size(); entityNum++) //entities
