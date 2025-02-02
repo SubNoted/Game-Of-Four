@@ -203,7 +203,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
 
-            z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>10;
+            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)/255);
             if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
                 // log_d("z_buff: %d", z_buffer_buffer);
                 continue;
@@ -263,7 +263,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             w2 = 255 - w0 - w1;
 
             
-            z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>10;
+            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)/255);
             if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
                 continue;
             }
