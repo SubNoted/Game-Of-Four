@@ -43,7 +43,7 @@ void Tscene::enter() {
 
     cube.init(entities);
     cube.createModel(blazeModel_PARAMETRS);
-    cube.Size = 25;
+    cube.Size = 15;
     cube.O.Equals(120,270,170);
     cube.setRotation(Vector(PI,0,0));
 

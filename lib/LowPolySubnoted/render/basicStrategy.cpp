@@ -72,15 +72,16 @@ inline void repose(Vector_16 &a, Vector_16 &b)
 void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
                                 Vector2_u8 uv0, Vector2_u8 uv1, Vector2_u8 uv2, \
                                 int16_t light0, int16_t light1, int16_t light2, \
-                                uint16_t* _img, uint8_t* data)
+                                uint16_t* _img, uint8_t* data, uint8_t texWeight, uint8_t texHeight)
 {
     //if (data == nullptr) return;
     
-    int16_t a, b, y, x, last;
+    int16_t a, b, ab, y, x, last;
     int16_t w0, w1, w2;
-    uint8_t *ptro, *ptrs;
 
-    uint16_t z_buffer_buffer = 0;
+    uint16_t precoord, coord;
+
+    uint16_t z_buffer_buffer;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
     if (v0.y > v1.y) {
@@ -93,14 +94,13 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
         repose(v0, v1); transpose(light0, light1);
     }
 
-    uint16_t maxX = v2.x, minX = v0.x, dx;
-    if (maxX < v1.x) maxX = v1.x;
-    if (maxX < v0.x) maxX = v0.x;
-    if (minX > v1.x) minX = v1.x;
-    if (minX > v2.x) minX = v2.x;
-    dx =(maxX - minX + 1);
-    // uint8_t* polyCanvas = (uint8_t*)alloca((v2.y - v0.y + 1) * dx * sizeof(uint16_t));
-    // if (polyCanvas == nullptr) return;
+    // uint16_t maxX = v2.x, minX = v0.x, dx;
+    // if (maxX < v1.x) maxX = v1.x;
+    // if (maxX < v0.x) maxX = v0.x;
+    // if (minX > v1.x) minX = v1.x;
+    // if (minX > v2.x) minX = v2.x;
+    // dx =(maxX - minX);
+    // uint16_t* _img_buffer = (uint16_t*)alloca(dx<<1);
     
     int16_t
     dx01 = v1.x - v0.x,
@@ -134,7 +134,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
 
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
-        int16_t lightBuffer = 0;
+        coord = x + y * SCRN_WIDTH;
         for (x = a; x <= b; x++)
         {
             uint16_t color;
@@ -145,13 +145,13 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
 
-            // z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>2;
-            // if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
-            //     continue;
-            // }
-            // z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
+            z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>8;
+            if (z_buffer_buffer >= z_buffer[coord]){
+                continue;
+            }
+            z_buffer[coord] = z_buffer_buffer;
 
-            light = (light0 * w0 + light1 * w1 + light2 * w2)/127 + 127;
+            light = (light0 * w0 + light1 * w1 + light2 * w2)>>7;
             if (light < 0) light = 0;
             else if (light > 255) light = 255;
             color = TFT_WHITE;
@@ -166,7 +166,7 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             color = (rxb & 0xF81F) | (xgx & 0x07E0);
 
             color = (color >> 8) | (color << 8);
-            _img[(x + y * SCRN_WIDTH)] = color;
+            _img[(coord)] = color;
         }
         return;
     }
@@ -181,45 +181,55 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
     else         last = v1.y - 1; // Skip it
 
     for (y = v0.y; y <= last; y++) {
-        if (y < 0 || y >= SCRN_HEIGHT) continue;
+        if (y >= SCRN_HEIGHT) break;
 
         a   = v0.x + sa / dy01;
         b   = v0.x + sb / dy02;
         sa += dx01;
         sb += dx02;
 
+        if (y < 0) continue;
+
+        if (a == b) continue;
         if (a > b) transpose(a, b);
+        if (a >= SCRN_WIDTH) continue;
+        if (b < 0) continue;
+        if (a < 0) a = 0;
+        if (b >= SCRN_WIDTH) b = SCRN_WIDTH;
         
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
+        precoord = y * SCRN_WIDTH;
         // int16_t lightBuffer = 0;
-        for (x = a; x <= b; x++)
+        for (x = a; x < b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
             int16_t light = 0;
             uint16_t color;
+            coord = precoord + x;
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
 
-            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)/255);
-            if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
+            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>8);
+            if (z_buffer_buffer >= z_buffer[coord]){
                 // log_d("z_buff: %d", z_buffer_buffer);
                 continue;
             } 
-            z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
+            z_buffer[coord] = z_buffer_buffer;
 
-            light = (light0 * w0 + light1 * w1 + light2 * w2)/127;
+            light = (light0 * w0 + light1 * w1 + light2 * w2)>>7;
             if (light < 0) light = 0;
             // if (light>>4 == lightBuffer>>4)
             // {
-            //     _img[(x + y * SCRN_WIDTH)] = colorBuffer;
+            //     _img[(coord)] = colorBuffer;
             //     continue;
             // }
             // lightBuffer = light;
             
             color = TFT_WHITE;
+            // color = data[0];
             
             rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
@@ -230,9 +240,10 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             color = (rxb & 0xF81F) | (xgx & 0x07E0);
 
             color = (color >> 8) | (color << 8);
-            _img[(x + y * SCRN_WIDTH)] = color;
+            // _img_buffer[(x - a)] = color;
+            _img[(coord)] = color;
         }
-        
+        // memcpy((uint8_t *)_img + ((a + y * SCRN_WIDTH) << 1), (uint8_t *)_img_buffer, (b - a)<<1);
     }
 
     // For lower part of triangle, find scanline crossings for segments
@@ -240,40 +251,49 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
     sa = dx12 * (y - v1.y);
     sb = dx02 * (y - v0.y);
     for (; y <= v2.y; y++) {
-        if (y < 0 || y >= SCRN_HEIGHT) continue;
+        if (y >= SCRN_HEIGHT) break;
 
         a   = v1.x + sa / dy12;
         b   = v0.x + sb / dy02;
         sa += dx12;
         sb += dx02;
 
+        if (y < 0) continue;
+
+        if (a == b) continue;
         if (a > b) transpose(a, b);
+        if (a >= SCRN_WIDTH) continue;
+        if (b < 0) continue;
+        if (a < 0) a = 0;
+        if (b >= SCRN_WIDTH) b = SCRN_WIDTH;
 
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
+        precoord = y * SCRN_WIDTH;
         // int16_t lightBuffer = 0;
         for (x = a; x <= b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
             int16_t light = 0;
             uint16_t color;
+            coord = precoord + x;
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
 
             
-            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)/255);
-            if (z_buffer_buffer >= z_buffer[x + y * SCRN_WIDTH]){
+            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>8);
+            if (z_buffer_buffer >= z_buffer[coord]){
                 continue;
             }
-            z_buffer[x + y * SCRN_WIDTH] = z_buffer_buffer;
+            z_buffer[coord] = z_buffer_buffer;
 
-            light = (light0 * w0 + light1 * w1 + light2 * w2)/127;
+            light = (light0 * w0 + light1 * w1 + light2 * w2)>>7;
             if (light < 0) light = 0;
             // if (light>>4 == lightBuffer>>4)
             // {
-            //     _img[(x + y * SCRN_WIDTH)] = colorBuffer;
+            //     _img[(coord)] = colorBuffer;
             //     continue;
             // }
             // lightBuffer = light;
@@ -289,8 +309,10 @@ void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1
             color = (rxb & 0xF81F) | (xgx & 0x07E0);
 
             color = (color >> 8) | (color << 8);
-            _img[(x + y * SCRN_WIDTH)] = color;
+            // _img_buffer[(x - a)] = color;
+            _img[(coord)] = color;
         }
+        // memcpy((uint8_t *)_img + ((a + y * SCRN_WIDTH) << 1), (uint8_t *)_img_buffer, (b - a)<<1);
     }
 }
 void BasicRendererStrategy::pushColorTriangleToCanvas(Vector2_16 v0, Vector2_16 v1, Vector2_16 v2, \
@@ -367,6 +389,7 @@ void BasicRendererStrategy::pushColorTriangleToCanvas(Vector2_16 v0, Vector2_16 
         sa += dx01;
         sb += dx02;
 
+        if (a == b) continue;
         if (a > b) transpose(a, b);        
         // sprite.drawFastHLine(a, y, b - a + 1, TFT_DARKGREY);
         
@@ -525,7 +548,8 @@ void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI
                     uv[0], uv[1], uv[2],
                     light[0], light[1], light[2],
                     cnvsPtr[cnvsNum],
-                    entity->textureMeta[polygon.texid]
+                    entity->textureMeta[polygon.texid],
+                    entity->textureWidth[polygon.texid], entity->textureHeight[polygon.texid]
                 );
 #if DEBUG_MODE
 
