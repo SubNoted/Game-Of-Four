@@ -24,17 +24,21 @@ class Vector2_16
     void Equals(const int16_t &x, const int16_t &y);
 };
 
-// class Vector2_8
-// {
-//     public:
-//     int8_t x, y;
-//     Vector2_8(void);
-//     Vector2_8(int8_t x, int8_t y)
-//     {
-//         this->x = x;
-//         this->y = y;
-//     };
-// };
+class Vector2_8
+{
+    public:
+    int8_t x=0, y=0;
+    Vector2_8(void)
+    {
+        this->x = 0;
+        this->y = 0;
+    };
+    Vector2_8(int8_t x, int8_t y)
+    {
+        this->x = x;
+        this->y = y;
+    };
+};
 
 // class Vector2_u16
 // {

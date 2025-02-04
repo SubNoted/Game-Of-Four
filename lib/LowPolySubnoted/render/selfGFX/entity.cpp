@@ -80,7 +80,7 @@ void Entity::init(std::vector<Entity*>& entities)
 }
 
 
-void Entity::createModel(const float v[][3], const int8_t vt[][2], const float vn[][3], const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t* tex, const uint8_t* texWidths, const uint16_t* texLengths, const uint32_t &texLength, const uint8_t &texsLength)
+void Entity::createModel(const float v[][3], const uint8_t vt[][2], const float vn[][3], const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t* tex, const uint8_t* texWidths, const uint16_t* texLengths, const uint32_t &texLength, const uint8_t &texsLength)
 {
     this->vertLength = vLength;
     this->polyLength = fLength;
@@ -89,7 +89,7 @@ void Entity::createModel(const float v[][3], const int8_t vt[][2], const float v
     this->textureCoords = new Vector2_u8[this->vertLength];
     this->normals = new Vector[this->vertLength];
 
-    this->vertices_b = (Vector_16 *)heap_caps_calloc(this->vertLength, sizeof(Vector_16), MALLOC_CAP_INTERNAL);
+    this->vertices_b = (Vector_16*)heap_caps_calloc(this->vertLength, sizeof(Vector_16), MALLOC_CAP_INTERNAL);
 
     for (int i = 0; i < this->vertLength; i++)
     {

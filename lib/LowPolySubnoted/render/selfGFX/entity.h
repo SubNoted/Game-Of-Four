@@ -105,7 +105,7 @@ public:
 
     void createCube(Vector o, Vector size);
 
-    void createModel(const float v[][3], const int8_t vt[][2], const float vn[][3], const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t* textures, const uint8_t* texWidths, const uint16_t *texLengths, const uint32_t &texLength, const uint8_t &texsLength);
+    void createModel(const float v[][3], const uint8_t vt[][2], const float vn[][3], const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t* textures, const uint8_t* texWidths, const uint16_t *texLengths, const uint32_t &texLength, const uint8_t &texsLength);
     
     
     void updateBuffer();
