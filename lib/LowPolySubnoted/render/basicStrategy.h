@@ -8,7 +8,7 @@ class BasicRendererStrategy : public IRendererStrategy {
 public:
     void renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) override;
 
-    void renderPolygons(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr); 
+    void IRAM_ATTR renderPolygons(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr); 
 
     uint8_t* z_buffer;
     BasicRendererStrategy()
@@ -20,7 +20,7 @@ public:
                                 Vector vn0, Vector vn1, Vector vn2, \
                                const Vector &lightDir, uint16_t* _img, const uint16_t &color);
 
-    void pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
+    void IRAM_ATTR pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
                                 Vector2_u8 uv0, Vector2_u8 uv1, Vector2_u8 uv2, \
                                 int16_t light0, int16_t light1, int16_t light2, \
                                 uint16_t* _img, uint8_t* data, uint8_t texWeight, uint8_t texHeight);

@@ -22,7 +22,7 @@ void GraphicsRenderer::init()
     
 }
 
-void GraphicsRenderer::renderScene(std::vector<Entity*>& entities)
+void IRAM_ATTR GraphicsRenderer::renderScene(std::vector<Entity*>& entities)
 {
     if (tft.dmaBusy())//todo optimize
         return;

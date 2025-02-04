@@ -69,7 +69,7 @@ inline void repose(Vector_16 &a, Vector_16 &b)
     b.z = tmp;
 }
 
-void BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
+void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
                                 Vector2_u8 uv0, Vector2_u8 uv1, Vector2_u8 uv2, \
                                 int16_t light0, int16_t light1, int16_t light2, \
                                 uint16_t* _img, uint8_t* data, uint8_t texWeight, uint8_t texHeight)
@@ -474,7 +474,7 @@ void BasicRendererStrategy::pushColorTriangleToCanvas(Vector2_16 v0, Vector2_16 
 
 
 
-void BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) 
+void IRAM_ATTR BasicRendererStrategy::renderScene(std::vector<Entity*>& entities, TFT_eSPI& tft, TFT_eSprite* canvas, uint16_t** cnvsPtr) 
 {
     for (uint8_t cnvsNum = 0; cnvsNum < SPLIT_SCREEN; cnvsNum++) 
     {

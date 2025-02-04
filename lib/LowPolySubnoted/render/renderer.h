@@ -10,7 +10,7 @@ public:
 
     void init();
 
-    void renderScene(std::vector<Entity*>& entities);
+    void IRAM_ATTR renderScene(std::vector<Entity*>& entities);
     
     void setStrategy(std::unique_ptr<IRendererStrategy> newStrategy) {
         strategy = std::move(newStrategy);
