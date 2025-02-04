@@ -34,10 +34,12 @@ protected:
     int16_t vertLength = 0;
     int16_t polyLength = 0;
 
-    uint8_t **textureMeta;
-    uint8_t *textureHeight, *textureWidth, *textureLength;
+    uint8_t *texture;
+    uint8_t *textureWidths;
+    uint16_t *textureLengths;
 
     uint8_t texturesLength;
+    uint32_t textureLength;
 
 private:
 
@@ -103,7 +105,7 @@ public:
 
     void createCube(Vector o, Vector size);
 
-    void createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t** texMeta, const uint8_t* tex_w, const uint8_t* tex_h, const uint8_t &texLength);
+    void createModel(const float v[][3], const int8_t vt[][2], const float vn[][3], const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t* textures, const uint8_t* texWidths, const uint16_t *texLengths, const uint32_t &texLength, const uint8_t &texsLength);
     
     
     void updateBuffer();

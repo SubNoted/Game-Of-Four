@@ -80,7 +80,7 @@ void Entity::init(std::vector<Entity*>& entities)
 }
 
 
-void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t** texMeta, const uint8_t* tex_w, const uint8_t* tex_h, const uint8_t &texLength)
+void Entity::createModel(const float v[][3], const int8_t vt[][2], const float vn[][3], const uint16_t &vLength, const uint16_t f[][10], const uint16_t &fLength, const uint8_t* tex, const uint8_t* texWidths, const uint16_t* texLengths, const uint32_t &texLength, const uint8_t &texsLength)
 {
     this->vertLength = vLength;
     this->polyLength = fLength;
@@ -93,10 +93,12 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
 
     for (int i = 0; i < this->vertLength; i++)
     {
-        this->vertices[i] = v[i];
-        this->textureCoords[i].x = vt[i].x*255;
-        this->textureCoords[i].y = vt[i].y*255;
-        this->normals[i] = vn[i];
+        this->vertices[i].Equals(v[i][0], v[i][1], v[i][2]);
+
+        this->textureCoords[i].x = vt[i][0];
+        this->textureCoords[i].y = vt[i][1];
+
+        this->normals[i].Equals(vn[i][0], vn[i][1], vn[i][2]);
     }
     
 
@@ -106,16 +108,20 @@ void Entity::createModel(const Vector* v, const Vector2* vt, const Vector* vn, c
         this->polygons[i] = Polygon(f[i][0], f[i][1], f[i][2], f[i][3], f[i][4], f[i][5], f[i][6], f[i][7], f[i][8], f[i][9]);
     }
 
-    this->texturesLength = texLength;
+    this->textureLength = texLength;
+    this->texturesLength = texsLength;
 
-    this->textureMeta = new uint8_t*[this->texturesLength];
-    this->textureWidth = new uint8_t[this->texturesLength];
-    this->textureHeight = new uint8_t[this->texturesLength];
+    this->texture = new uint8_t[this->textureLength];
+    for (int i = 0; i < this->textureLength; i++)
+    {
+        this->texture[i] = tex[i];
+    }
+    this->textureWidths = new uint8_t[this->texturesLength];
+    this->textureLengths = new uint16_t[this->texturesLength];
     for (int i = 0; i < this->texturesLength; i++)
     {
-        // this->textureMeta[i] = texMeta[i];//todo fix
-        this->textureWidth[i] = tex_w[i];
-        this->textureHeight[i] = tex_h[i];
+        this->textureWidths[i] = texWidths[i];
+        this->textureLengths[i] = texLengths[i];
     }
     updateBuffer();
 }

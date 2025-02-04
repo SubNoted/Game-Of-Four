@@ -72,7 +72,7 @@ inline void repose(Vector_16 &a, Vector_16 &b)
 void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Vector_16 v1, Vector_16 v2, \
                                 Vector2_u8 uv0, Vector2_u8 uv1, Vector2_u8 uv2, \
                                 int16_t light0, int16_t light1, int16_t light2, \
-                                uint16_t* _img, uint8_t* data, uint8_t texWeight, uint8_t texHeight)
+                                uint16_t* _img, uint8_t* data, uint8_t texWeight)
 {
     //if (data == nullptr) return;
     
@@ -212,7 +212,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             w1 = preW1 + x*dy02_S;
             w2 = 255 - w0 - w1;
 
-            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>8);
+            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>10);
             if (z_buffer_buffer >= z_buffer[coord]){
                 // log_d("z_buff: %d", z_buffer_buffer);
                 continue;
@@ -229,7 +229,8 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             // lightBuffer = light;
             
             color = TFT_WHITE;
-            // color = data[0];
+            color = data[((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1]<<8 | \
+                    data[(((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1) + 1];
             
             rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
@@ -283,7 +284,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             w2 = 255 - w0 - w1;
 
             
-            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>8);
+            z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>10);
             if (z_buffer_buffer >= z_buffer[coord]){
                 continue;
             }
@@ -299,6 +300,10 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             // lightBuffer = light;
             
             color = TFT_WHITE;
+            color = data[((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1]<<8 | \
+                    data[(((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1) + 1];
+            // color = data[(0)<<1]<<8 | \
+            //         data[((0)<<1) + 1];
             
             rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
@@ -500,7 +505,7 @@ void IRAM_ATTR BasicRendererStrategy::renderScene(std::vector<Entity*>& entities
                 Vector2_u8 uv[3] = {entity->textureCoords[polygon.vt[0]],
                                     entity->textureCoords[polygon.vt[1]],
                                     entity->textureCoords[polygon.vt[2]]};
-                Vector norms[3] = {(entity->normals[polygon.vn[0]]),
+                Vector norms[3] = { (entity->normals[polygon.vn[0]]),
                                     (entity->normals[polygon.vn[1]]), 
                                     (entity->normals[polygon.vn[2]])};
                 // if (norms[0].z < 0 || norms[1].z < 0 || norms[2].z < 0) continue;
@@ -518,9 +523,9 @@ void IRAM_ATTR BasicRendererStrategy::renderScene(std::vector<Entity*>& entities
                 // uint16_t color = TFT_WHITE;
                 // float shade = normal.ScalarProd(lightDirection)/2+0.5; //todo optimize to unitvector
 
-                // pushImage(0,0, 64, 32, cnvsPtr[cnvsNum], blazeTex);
+                // pushImage(0,0, 64, 128, cnvsPtr[cnvsNum], entity->texture);
 
-                // canvas[cnvsNum].pushImage(0,0, 64, 32, blazeTex);
+                // canvas[cnvsNum].pushImage(0,0, 64, 64, entity->texture );
 
                 // pushImageTriangleToCanvas(
                 //     verts[0].x, verts[0].y,
@@ -543,13 +548,18 @@ void IRAM_ATTR BasicRendererStrategy::renderScene(std::vector<Entity*>& entities
                 //     TFT_WHITE
                 // );
                 
+                uint32_t texOffset = 0;
+                for (uint8_t t = 0; t < polygon.texid; t++)
+                {
+                    texOffset += entity->textureLengths[t];
+                }
                 pushImageTriangleToCanvas(
                     verts[0], verts[1], verts[2],
                     uv[0], uv[1], uv[2],
                     light[0], light[1], light[2],
                     cnvsPtr[cnvsNum],
-                    entity->textureMeta[polygon.texid],
-                    entity->textureWidth[polygon.texid], entity->textureHeight[polygon.texid]
+                    entity->texture + (texOffset<<1),
+                    entity->textureWidths[polygon.texid]
                 );
 #if DEBUG_MODE
 
