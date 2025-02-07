@@ -14,7 +14,7 @@ float normalSin(float x)//from 0 to 1 on PI //todo to physics engine
     return pow(sin(x/2), 2);
 }
 
-Entity cube;
+Entity cube, blaze;
 float size = 150, x = CENTR_X, y = CENTR_Y + 50;
 float input_x = 0, input_y = 0;
 
@@ -34,7 +34,10 @@ void Tscene::update(uint32_t deltaTime)
 #endif
 
     if (abs(input_x) > 0.045 || abs(input_y) > 0.045)
+    {
         cube.rotate(Vector(0,-0.005*deltaTime*input_x,-0.005*deltaTime*input_y));
+        blaze.rotate(Vector(0,-0.005*deltaTime*input_x,-0.005*deltaTime*input_y));
+    }
 
     // cube.setRotation(Vector(0.002*millis(),0,y));
 }
@@ -43,10 +46,15 @@ void Tscene::enter() {
 
     cube.init(entities);
     cube.createModel(blazeModel_PARAMETRS);
-    cube.Size = 30;
-    cube.O.Equals(120,270,170);
-    cube.setRotation(Vector(PI,0,0));
+    cube.Size = 13;
+    cube.O.Equals(90,250,100);
+    cube.setRotation(Vector(PI,PI,0));
 
+    blaze.init(entities);
+    blaze.createModel(blazeModel_PARAMETRS);
+    blaze.Size = 23;
+    blaze.O.Equals(160,270,170);
+    blaze.setRotation(Vector(PI,PI,0));
     // cube.createCube(Vector(x, y, 100), Vector(size));
 
     //texture
