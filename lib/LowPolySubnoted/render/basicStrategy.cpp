@@ -77,21 +77,21 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
     //if (data == nullptr) return;
     
     int16_t a, b, ab, y, x, last;
-    int16_t w0, w1, w2;
+    int32_t w0, w1, w2;
 
-    uint16_t precoord, coord;
+    uint16_t precoord, coord, texCoord;
 
     uint16_t z_buffer_buffer;
 
     // Sort coordinates by Y order (y2 >= y1 >= y0)
     if (v0.y > v1.y) {
-        repose(v0, v1); transpose(light0, light1); 
+        repose(v0, v1); repose(uv0, uv1); transpose(light0, light1); 
     }
     if (v1.y > v2.y) {
-        repose(v2, v1); transpose(light2, light1);
+        repose(v2, v1); repose(uv2, uv1); transpose(light2, light1);
     }
     if (v0.y > v1.y) {
-        repose(v0, v1); transpose(light0, light1);
+        repose(v0, v1); repose(uv0, uv1); transpose(light0, light1);
     }
 
     // uint16_t maxX = v2.x, minX = v0.x, dx;
@@ -111,12 +111,12 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
     dy12 = v2.y - v1.y,
     sa   = 0,
     sb   = 0;
-    int16_t
+    int32_t
     S = (dy12 * dx02 - dx12 * dy02),
-    dx12_S = 255*(dx12)/S,
-    dy12_S = 255*(dy12)/S,
-    dx02_S = 255*(dx02)/S,
-    dy02_S = 255*(dy02)/S,
+    dx12_S = 256*(dx12)/S,
+    dy12_S = 256*(dy12)/S,
+    dx02_S = 256*(dx02)/S,
+    dy02_S = 256*(dy02)/S,
     prepreW0 = v2.x * dy12_S - v2.y * dx12_S, //I realy have no idea how to name it
     prepreW1 = v2.y * dx02_S - v2.x * dy02_S,
     preW0 = 0,
@@ -143,7 +143,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
-            w2 = 255 - w0 - w1;
+            w2 = 256 - w0 - w1;
 
             z_buffer_buffer = (v0.z * w0 + v1.z * w1 + v2.z * w2)>>8;
             if (z_buffer_buffer >= z_buffer[coord]){
@@ -154,7 +154,6 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             light = (light0 * w0 + light1 * w1 + light2 * w2)>>7;
             if (light < 0) light = 0;
             else if (light > 255) light = 255;
-            color = TFT_WHITE;
 
             // Split out and blend 5-bit red and blue channels
             rxb = TFT_BLACK & 0xF81F;
@@ -200,6 +199,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
         preW0 = prepreW0 + y*dx12_S;
         preW1 = prepreW1 - y*dx02_S;
         precoord = y * SCRN_WIDTH;
+        
         // int16_t lightBuffer = 0;
         for (x = a; x < b; x++)
         {
@@ -210,7 +210,8 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
-            w2 = 255 - w0 - w1;
+            w2 = 256 - w0 - w1;
+            texCoord = (((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight) + ((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8);
 
             z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>10);
             if (z_buffer_buffer >= z_buffer[coord]){
@@ -220,7 +221,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             z_buffer[coord] = z_buffer_buffer;
 
             light = (light0 * w0 + light1 * w1 + light2 * w2)>>7;
-            if (light < 0) light = 0;
+            if (light < 20) light = 20;
             // if (light>>4 == lightBuffer>>4)
             // {
             //     _img[(coord)] = colorBuffer;
@@ -228,9 +229,9 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             // }
             // lightBuffer = light;
             
-            color = TFT_WHITE;
-            color = data[((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1]<<8 | \
-                    data[(((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1) + 1];
+            color = data[(texCoord)<<1]<<8 | \
+                    data[((texCoord)<<1) + 1];
+            // log_d("vt.y: %d", ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight);
             
             rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
@@ -272,7 +273,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
         preW1 = prepreW1 - y*dx02_S;
         precoord = y * SCRN_WIDTH;
         // int16_t lightBuffer = 0;
-        for (x = a; x <= b; x++)
+        for (x = a; x < b; x++)
         {
             if (x < 0 || x >= SCRN_WIDTH) continue;
             int16_t light = 0;
@@ -281,8 +282,8 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
 
             w0 = preW0 - x*dy12_S;
             w1 = preW1 + x*dy02_S;
-            w2 = 255 - w0 - w1;
-
+            w2 = 256 - w0 - w1;
+            texCoord = (((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight) + ((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8);
             
             z_buffer_buffer = ((v0.z * w0 + v1.z * w1 + v2.z * w2)>>10);
             if (z_buffer_buffer >= z_buffer[coord]){
@@ -291,7 +292,7 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             z_buffer[coord] = z_buffer_buffer;
 
             light = (light0 * w0 + light1 * w1 + light2 * w2)>>7;
-            if (light < 0) light = 0;
+            if (light < 20) light = 20;
             // if (light>>4 == lightBuffer>>4)
             // {
             //     _img[(coord)] = colorBuffer;
@@ -299,11 +300,8 @@ void IRAM_ATTR BasicRendererStrategy::pushImageTriangleToCanvas(Vector_16 v0, Ve
             // }
             // lightBuffer = light;
             
-            color = TFT_WHITE;
-            color = data[((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1]<<8 | \
-                    data[(((uv0.x * w0 + uv1.x * w1 + uv2.x * w2)>>8 + ((uv0.y * w0 + uv1.y * w1 + uv2.y * w2)>>8) * texWeight)<<1) + 1];
-            // color = data[(0)<<1]<<8 | \
-            //         data[((0)<<1) + 1];
+            color = data[(texCoord)<<1]<<8 | \
+                    data[((texCoord)<<1) + 1];
             
             rxb = TFT_BLACK & 0xF81F;
             rxb += ((color & 0xF81F) - rxb) * (light >> 2) >> 6;
@@ -509,9 +507,9 @@ void IRAM_ATTR BasicRendererStrategy::renderScene(std::vector<Entity*>& entities
                                     (entity->normals[polygon.vn[1]]), 
                                     (entity->normals[polygon.vn[2]])};
                 // if (norms[0].z < 0 || norms[1].z < 0 || norms[2].z < 0) continue;
-                int16_t light[3] = {((norms[0].x * lightDirection.x) + (norms[0].y * lightDirection.y) + (norms[0].z * lightDirection.z)),
-                                    ((norms[1].x * lightDirection.x) + (norms[1].y * lightDirection.y) + (norms[1].z * lightDirection.z)),
-                                    ((norms[2].x * lightDirection.x) + (norms[2].y * lightDirection.y) + (norms[2].z * lightDirection.z))};
+                int16_t light[3] = {int16_t((norms[0].x * lightDirection.x) + (norms[0].y * lightDirection.y) + (norms[0].z * lightDirection.z)),
+                                    int16_t((norms[1].x * lightDirection.x) + (norms[1].y * lightDirection.y) + (norms[1].z * lightDirection.z)),
+                                    int16_t((norms[2].x * lightDirection.x) + (norms[2].y * lightDirection.y) + (norms[2].z * lightDirection.z))};
                 
 
                 // Vector normal(Vector::Normal(verts[0], verts[1], verts[2]));

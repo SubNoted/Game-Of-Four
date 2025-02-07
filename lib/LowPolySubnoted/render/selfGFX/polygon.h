@@ -38,7 +38,7 @@ public:
     uint16_t v[3];
     uint16_t vt[3];
     uint16_t vn[3];
-    uint8_t texid;
+    int8_t texid;
     
     Polygon(void);
     Polygon(const uint16_t& v0, const uint16_t& v1, const uint16_t& v2, \
